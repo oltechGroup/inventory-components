@@ -47,7 +47,14 @@ export const SidebarComponent = () => {
         </div>
       </Sidebar.Header>
       <Sidebar.Body>
-        <NavLink to={routes.home}>
+      <NavLink to={routes.dashboard}>
+          <Sidebar.Item>
+            <SquaresFour size={24} />
+            Inicio
+          </Sidebar.Item>
+        </NavLink>
+
+        <NavLink to={routes.consumo}>
           <Sidebar.Item>
             <SquaresFour size={24} />
             Consumo
