@@ -9,6 +9,8 @@ import {
   Input,
   Dropdown,
   Icon,
+  DatePicker,
+  Label,
 } from "keep-react";
 import {
   ArrowDown,
@@ -45,6 +47,8 @@ function Store() {
     measures: "",
     category: "",
     stock: 0,
+    lote: "",
+    caducidad: "",
   });
 
   const [componentes, setComponentes] = useState([]);
@@ -200,7 +204,28 @@ function Store() {
           <Badge>{componente.category}</Badge>
         </Table.Cell>
         <Table.Cell>
-          <p>{new Date(componente.registration_date).toDateString()}</p>
+          <p>
+            {new Date(componente.registration_date).toLocaleDateString(
+              "es-MX",
+              {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              }
+            )}
+          </p>
+        </Table.Cell>
+        <Table.Cell>
+          <Badge color="warning">{componente.lote}</Badge>
+        </Table.Cell>
+        <Table.Cell>
+          <p>
+            {new Date(componente.caducidad).toLocaleDateString("es-MX", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </p>
         </Table.Cell>
         <Table.Cell>
           <Dropdown
@@ -245,7 +270,10 @@ function Store() {
 
   useEffect(() => getCategories(), []);
 
-  useEffect(() => getComponents(), [paramsAPI]);
+  useEffect(() => {
+    getComponents();
+    window.scrollTo(0, 0);
+  }, [paramsAPI]);
 
   return (
     <>
@@ -273,12 +301,29 @@ function Store() {
                     type="text"
                     onChange={handleChange}
                   />
-                  <Input
-                    placeholder="Cantidad"
-                    name="stock"
-                    type="text"
-                    onChange={handleChange}
-                  />
+                  <div className="flex gap-4">
+                    <Input
+                      placeholder="Cantidad"
+                      name="stock"
+                      type="number"
+                      onChange={handleChange}
+                    />
+                    <Input
+                      placeholder="Lote"
+                      name="lote"
+                      type="text"
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="caducidad">Fecha de Caducidad</Label>
+                    <input
+                      type="date"
+                      name="caducidad"
+                      onChange={handleChange}
+                    />
+                  </div>
+
                   <select name="category" onChange={handleChange}>
                     <option value="1">Seleccionar Categoria</option>
                     {categories.map((category) => (
@@ -432,6 +477,9 @@ function Store() {
           <Table.HeadCell>En Stock</Table.HeadCell>
           <Table.HeadCell>Categoría</Table.HeadCell>
           <Table.HeadCell>Fecha Registro</Table.HeadCell>
+          <Table.HeadCell>Lote</Table.HeadCell>
+          <Table.HeadCell>Caducidad</Table.HeadCell>
+
           <Table.HeadCell />
         </Table.Head>
         <Table.Body className="divide-gray-25 divide-y">

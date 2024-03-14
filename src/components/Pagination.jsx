@@ -5,7 +5,7 @@ function PaginationComponent({ currentPage, totalPages, onPageChange }) {
   if (totalPages <= 1) {
     return null;
   }
-  
+
   return (
     <Pagination shape="circle" className="flex justify-center my-5">
       <Pagination.Navigator
@@ -46,6 +46,7 @@ function PaginationComponent({ currentPage, totalPages, onPageChange }) {
         shape="circle"
         onClick={() => {
           if (currentPage < totalPages) {
+            window.scrollTo(0, 0);
             onPageChange(currentPage + 1);
           }
         }}

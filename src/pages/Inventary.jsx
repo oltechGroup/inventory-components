@@ -138,7 +138,10 @@ function Inventary() {
 
   useEffect(() => getCategories(), []);
 
-  useEffect(() => getComponentesInventory(), [paramsAPI]);
+  useEffect(() => {
+    getComponentesInventory()
+    window.scrollTo(0, 0);
+  }, [paramsAPI]);
 
   return (
     <>

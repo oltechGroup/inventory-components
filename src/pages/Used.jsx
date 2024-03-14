@@ -65,13 +65,12 @@ function Used() {
     }
   };
   const selectComponent = (componente) => {
-    console.log(componente);
     setSearchActive(false);
     setSearchComponentes([]);
     setDataNewRegister({
       ...dataNewRegister,
       componente: componente.id,
-      nameComponente: `${componente.measures} - ${componente.category}`,
+      nameComponente: `${componente.measures} - ${componente.category}, ${componente.stock} disponibles`,
     });
   };
   const activeSearch = () => {
@@ -226,7 +225,10 @@ function Used() {
     getCategories();
   }, []);
 
-  useEffect(() => getComponentes(), [paramsAPI]);
+  useEffect(() => {
+    getComponentes();
+    window.scrollTo(0, 0);
+  }, [paramsAPI]);
 
   return (
     <>
@@ -272,8 +274,18 @@ function Used() {
                             className="p-2 border-b border-gray-200 cursor-pointer hover:bg-slate-200 rounded"
                             onClick={() => selectComponent(componente)}
                           >
-                            <p>{componente.measures}</p>
-                            <p>{componente.category}</p>
+                            <div className="flex gap-2">
+                              <p>{componente.measures}</p>
+                              <p>{componente.category}</p>
+                              <p>Lote: {componente.lote}</p>
+                              <p>
+                                Caducidad:{" "}
+                                {new Date(
+                                  componente.caducidad
+                                ).toLocaleDateString()}
+                              </p>
+                              <p>Stock: {componente.stock}</p>
+                            </div>
                           </div>
                         ))}
                       </div>
