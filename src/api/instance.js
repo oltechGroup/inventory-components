@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const instance = axios.create({
-  // baseURL: "https://emails-server.fly.dev",
+  baseURL: "https://emails-server.fly.dev",
 
-  baseURL: "http://localhost:8080",
+  // baseURL: "http://localhost:8080",
 });
