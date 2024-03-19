@@ -53,7 +53,7 @@ function Store() {
 
   const [componentes, setComponentes] = useState([]);
   const [componentesInfo, setComponentesInfo] = useState({});
-
+console.log(componentesInfo);
   const [isOpen, setIsOpen] = useState(false);
 
   // states for update component
@@ -275,6 +275,8 @@ function Store() {
     window.scrollTo(0, 0);
   }, [paramsAPI]);
 
+  console.log(paramsAPI);
+
   return (
     <>
       <Modal isOpen={isOpen} onClose={closeModal}>
@@ -488,8 +490,8 @@ function Store() {
       </Table>
       <PaginationComponent
         currentPage={paramsAPI.page}
-        onPageChange={handlePageChange}
-        totalPages={componentesInfo.totalPages}
+        onChange={handlePageChange}
+        pages={componentesInfo.totalPages}
       />
     </>
   );

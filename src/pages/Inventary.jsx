@@ -207,8 +207,8 @@ function Inventary() {
       </Table>
       <PaginationComponent
         currentPage={paramsAPI.page}
-        onPageChange={handlePageChange}
-        totalPages={componentesInfo.totalPages}
+        onChange={handlePageChange}
+        pages={componentesInfo.totalPages}
       />
     </>
   );

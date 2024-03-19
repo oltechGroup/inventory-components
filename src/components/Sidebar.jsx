@@ -1,8 +1,10 @@
 import {
-  ArchiveTray,
+  Archive,
+  Database,
+  FilePlus,
+  FirstAid,
   List,
   MagnifyingGlass,
-  ShoppingCart,
   SquaresFour,
 } from "phosphor-react";
 import {
@@ -47,7 +49,7 @@ export const SidebarComponent = () => {
         </div>
       </Sidebar.Header>
       <Sidebar.Body>
-      <NavLink to={routes.dashboard}>
+        <NavLink to={routes.dashboard}>
           <Sidebar.Item>
             <SquaresFour size={24} />
             Inicio
@@ -56,28 +58,28 @@ export const SidebarComponent = () => {
 
         <NavLink to={routes.consumo}>
           <Sidebar.Item>
-            <SquaresFour size={24} />
+            <FilePlus size={24} />
             Consumo
           </Sidebar.Item>
         </NavLink>
 
         <NavLink to={routes.store}>
           <Sidebar.Item>
-            <SquaresFour size={24} />
+            <Database size={24} />
             Almacen
           </Sidebar.Item>
         </NavLink>
 
         <NavLink to={routes.inventary}>
           <Sidebar.Item>
-            <SquaresFour size={24} />
+            <Archive size={24} />
             Inventario
           </Sidebar.Item>
         </NavLink>
 
         <NavLink to={routes.hospitals}>
           <Sidebar.Item>
-            <SquaresFour size={24} />
+            <FirstAid size={24} />
             Hospitales
           </Sidebar.Item>
         </NavLink>

@@ -10,6 +10,8 @@ import {
   Input,
   Dropdown,
   Icon,
+  Label,
+  NumberInput,
 } from "keep-react";
 import {
   ArrowDown,
@@ -19,6 +21,8 @@ import {
   Trash,
   CloudArrowUp,
   MagnifyingGlass,
+  Minus,
+  Plus,
 } from "phosphor-react";
 
 import { useEffect, useState } from "react";
@@ -46,7 +50,7 @@ function Used() {
     componente: "",
     hospital: "",
     patient: "",
-    quantity: "",
+    quantity: 1,
     registration_date: new Date(),
   });
 
@@ -71,6 +75,7 @@ function Used() {
       ...dataNewRegister,
       componente: componente.id,
       nameComponente: `${componente.measures} - ${componente.category}, ${componente.stock} disponibles`,
+      stock: componente.stock,
     });
   };
   const activeSearch = () => {
@@ -116,11 +121,26 @@ function Used() {
     });
   };
 
+  const checkStock = (value) => {
+    if (value > dataNewRegister.stock) {
+      return dataNewRegister.stock;
+    } else {
+      return value;
+    }
+  };
+
   const handleChange = (e) => {
     setDataNewRegister({
       ...dataNewRegister,
       [e.target.name]: e.target.value,
     });
+
+    if (e.target.name === "quantity") {
+      setDataNewRegister({
+        ...dataNewRegister,
+        quantity: checkStock(e.target.value),
+      });
+    }
   };
 
   const renderComponentes = () => {
@@ -291,13 +311,54 @@ function Used() {
                       </div>
                     )}
                   </div>
-                  <Input
-                    placeholder="Cantidad utilizada"
-                    type="number"
-                    name="quantity"
-                    value={dataNewRegister.quantity}
-                    onChange={handleChange}
-                  />
+                  {dataNewRegister.stock && (
+                    <fieldset className="space-y-1">
+                      <Label>Cantidad Utilizada</Label>
+                      <NumberInput>
+                        <NumberInput.Button
+                          onClick={() =>
+                            setDataNewRegister({
+                              ...dataNewRegister,
+                              quantity:
+                                dataNewRegister.quantity - 1 < 1
+                                  ? 1
+                                  : dataNewRegister.quantity - 1,
+                            })
+                          }
+                        >
+                          <Minus size={16} color="#455468" />
+                        </NumberInput.Button>
+                        <NumberInput.Input
+                          onChange={handleChange}
+                          defaultValue={dataNewRegister.quantity}
+                          value={dataNewRegister.quantity}
+                          name="quantity"
+                          id="quantity"
+                          max={dataNewRegister.stock}
+                          min={1}
+                          maxLength={dataNewRegister.stock}
+                          minLength={1}
+                        />
+                        <NumberInput.Button
+                          onClick={() =>
+                            setDataNewRegister({
+                              ...dataNewRegister,
+                              quantity:
+                                dataNewRegister.quantity + 1 >
+                                dataNewRegister.stock
+                                  ? dataNewRegister.stock
+                                  : dataNewRegister.quantity + 1,
+                            })
+                          }
+                        >
+                          <Plus size={16} color="#455468" />
+                        </NumberInput.Button>
+                      </NumberInput>
+                      {/* <p className="text-body-4 font-normal text-metal-600">
+                        La cantidad maximá es de {dataNewRegister.stock}
+                      </p> */}
+                    </fieldset>
+                  )}
                   <select name="hospital" id="hospital" onChange={handleChange}>
                     <option value="Categoria">Seleccionar Hospital</option>
                     {selectHospitals.map((hospital) => (
@@ -399,8 +460,8 @@ function Used() {
       </Table>
       <PaginationComponent
         currentPage={paramsAPI.page}
-        onPageChange={handlePageChange}
-        totalPages={componentesInfo.totalPages}
+        onChange={handlePageChange}
+        pages={componentesInfo.totalPages}
       />
     </>
   );
