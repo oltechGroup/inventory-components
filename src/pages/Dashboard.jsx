@@ -34,7 +34,8 @@ function Dashboard() {
         </Badge>
       </div>
 
-      <AreaChart chartData={chartData} dataKey="sell" />
+      <Badge className="absolute mt-10">Inventario</Badge>
+      <AreaChart chartData={chartData} dataKey="sell" showTooltip={true} chartType="natural" />
 
       <section className="flex gap-6 flex-wrap mb-6">
         {stadistics.countComponetesByCategory?.map((item, index) => (
