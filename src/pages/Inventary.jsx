@@ -12,8 +12,11 @@ import {
 import { useEffect, useState } from "react";
 import { instance } from "../api/instance";
 import PaginationComponent from "../components/Pagination";
+import { SkeletonTable } from "../components/SkeletonTable";
 
 function Inventary() {
+  const [loading, setLoading] = useState(true);
+
   const [paramsAPI, setParamsAPI] = useState({
     page: 1,
     perPage: 20,
@@ -33,13 +36,15 @@ function Inventary() {
   const [componentesInventory, setComponentesInventory] = useState([]);
   const [componentesInfo, setComponentesInfo] = useState({});
   const getComponentesInventory = () => {
+    setLoading(true);
     instance
-      .get("/componentes/all/inventory", { params: paramsAPI })
+      .get("/componentes/inventory", { params: paramsAPI })
       .then((response) => {
         setComponentesInventory(response.data.data);
         setComponentesInfo(response.data.info);
         console.log(response.data);
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
   const renderComponentesInventory = () => {
@@ -109,14 +114,14 @@ function Inventary() {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <p className="-mb-0.5 text-body-4 font-medium text-metal-600">
-                  {componente.measures}
+                  {componente.componentes.measures}
                 </p>
               </div>
             </div>
           </div>
         </Table.Cell>
         <Table.Cell>
-          <Badge>{componente.category}</Badge>
+          <Badge>{componente.componentes.componentes_categories.name}</Badge>
         </Table.Cell>
         <Table.Cell>{operation(componente.tipo_movimiento)}</Table.Cell>
         <Table.Cell>
@@ -139,7 +144,7 @@ function Inventary() {
   useEffect(() => getCategories(), []);
 
   useEffect(() => {
-    getComponentesInventory()
+    getComponentesInventory();
     window.scrollTo(0, 0);
   }, [paramsAPI]);
 
@@ -187,23 +192,31 @@ function Inventary() {
           </div>
         </Table.Caption>
 
-        <Table.Head>
-          <Table.HeadCell>
-            <p className="text-body-5 font-medium text-metal-400">Medidas</p>
-          </Table.HeadCell>
-          <Table.HeadCell>Categoría</Table.HeadCell>
-          <Table.HeadCell icon={<ArrowsDownUp size={14} color="#8897AE" />}>
-            Movimiento
-          </Table.HeadCell>
-          <Table.HeadCell icon={<ArrowsDownUp size={14} color="#8897AE" />}>
-            Cantidad
-          </Table.HeadCell>
-          <Table.HeadCell>Fecha Registro</Table.HeadCell>
-          <Table.HeadCell />
-        </Table.Head>
-        <Table.Body className="divide-gray-25 divide-y">
-          {renderComponentesInventory()}
-        </Table.Body>
+        {loading ? (
+          <SkeletonTable />
+        ) : (
+          <>
+            <Table.Head>
+              <Table.HeadCell>
+                <p className="text-body-5 font-medium text-metal-400">
+                  Medidas
+                </p>
+              </Table.HeadCell>
+              <Table.HeadCell>Categoría</Table.HeadCell>
+              <Table.HeadCell icon={<ArrowsDownUp size={14} color="#8897AE" />}>
+                Movimiento
+              </Table.HeadCell>
+              <Table.HeadCell icon={<ArrowsDownUp size={14} color="#8897AE" />}>
+                Cantidad
+              </Table.HeadCell>
+              <Table.HeadCell>Fecha Registro</Table.HeadCell>
+              <Table.HeadCell />
+            </Table.Head>
+            <Table.Body className="divide-gray-25 divide-y">
+              {renderComponentesInventory()}
+            </Table.Body>
+          </>
+        )}
       </Table>
       <PaginationComponent
         currentPage={paramsAPI.page}
