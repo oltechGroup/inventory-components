@@ -12,6 +12,7 @@ import {
   Icon,
   Label,
   NumberInput,
+  Spinner,
 } from "keep-react";
 import {
   ArrowDown,
@@ -30,8 +31,20 @@ import { instance } from "../api/instance";
 
 import Swal from "sweetalert2";
 import PaginationComponent from "../components/Pagination";
+import { SkeletonTable } from "../components/SkeletonTable";
+
+const BadgeComponent = ({ children }) => {
+  return (
+    <div className="bg-primary-50 px-3 rounded-2xl max-w-max">
+      <p className="font-semibold text-primary-500 text-body-5">{children}</p>
+    </div>
+  );
+};
 
 function Used() {
+  const [loading, setLoading] = useState(true);
+  const [sendingForm, setSendingForm] = useState(false);
+
   const [paramsAPI, setParamsAPI] = useState({
     page: 1,
     perPage: 20,
@@ -51,9 +64,75 @@ function Used() {
     hospital: "",
     patient: "",
     quantity: 1,
-    registration_date: new Date(),
+    used_date: new Date(),
   });
 
+  // states for update component
+  const [modalUpdateOpen, setModalUpdateOpen] = useState(false);
+  const [componentToUpdate, setComponentToUpdate] = useState({
+    componente: "",
+    hospital: "",
+    patient: "",
+    quantity: "",
+    used_date: "",
+    quantityOriginalUsed: "",
+  });
+  const showModalUpdate = (component) => {
+    setComponentToUpdate({
+      ...component,
+      category: component.category_id,
+      hospital: component.hospitals.id,
+      quantityOriginalUsed: component.quantity,
+    });
+    setModalUpdateOpen(true);
+  };
+  const closeModalUpdate = () => {
+    setComponentToUpdate({});
+    setModalUpdateOpen(false);
+  };
+  const handleChangeUpdate = (e) => {
+    console.log(e.target.name);
+    setComponentToUpdate({
+      ...componentToUpdate,
+      [e.target.name]: e.target.value,
+    });
+    if (e.target.name === "quantityUpdate") {
+      setComponentToUpdate({
+        ...componentToUpdate,
+        quantity: checkStockUpdate(e.target.value),
+      });
+    }
+  };
+  const sendFormUpdate = async () => {
+    setSendingForm(true);
+    try {
+      await instance.put(`/componentes/used/${componentToUpdate.id}`, {
+        used_date: new Date(componentToUpdate.used_date),
+        quantity: parseInt(componentToUpdate.quantity),
+        patient: componentToUpdate.patient,
+        hospital_id: parseInt(componentToUpdate.hospital),
+      });
+      getComponentes();
+      closeModalUpdate();
+      Swal.fire({
+        title: "Actualizado",
+        text: "El componente ha sido actualizado exitosamente!",
+        icon: "success",
+      });
+      setSendingForm(false);
+    } catch (error) {
+      setSendingForm(false);
+      console.error(error);
+      Swal.fire({
+        title: "Error",
+        text: "Ha ocurrido un error al actualizar el componente",
+        icon: "error",
+      });
+    }
+  };
+  // End states for update component
+
+  // States for search component
   const [searchComponentes, setSearchComponentes] = useState([]);
   const [searchActive, setSearchActive] = useState(false);
   const handleSearch = (e) => {
@@ -74,7 +153,7 @@ function Used() {
     setDataNewRegister({
       ...dataNewRegister,
       componente: componente.id,
-      nameComponente: `${componente.measures} - ${componente.category}, ${componente.stock} disponibles`,
+      nameComponente: `${componente.measures} - ${componente.componentes_categories.name}, ${componente.stock} disponibles`,
       stock: componente.stock,
     });
   };
@@ -90,12 +169,14 @@ function Used() {
   const [componentes, setComponentes] = useState([]);
   const [componentesInfo, setComponentesInfo] = useState({});
   const getComponentes = () => {
+    setLoading(true);
     instance
-      .get("/componentes/all/used", { params: paramsAPI })
+      .get("/componentes/used", { params: paramsAPI })
       .then((response) => {
         setComponentes(response.data.data);
         setComponentesInfo(response.data.info);
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
   const [categories, setCategories] = useState([]);
@@ -116,7 +197,7 @@ function Used() {
   };
 
   const getHospitalsSelect = () => {
-    instance.get("/hospitals/selects").then((response) => {
+    instance.get("/hospitals/select").then((response) => {
       setSelectHospitals(response.data);
     });
   };
@@ -127,6 +208,20 @@ function Used() {
     } else {
       return value;
     }
+  };
+
+  const checkStockUpdate = (value) => {
+    if (
+      value >
+      componentToUpdate.componentes?.stock +
+        componentToUpdate.quantityOriginalUsed
+    ) {
+      return (
+        componentToUpdate.componentes?.stock +
+        componentToUpdate.quantityOriginalUsed
+      );
+    }
+    return value;
   };
 
   const handleChange = (e) => {
@@ -143,6 +238,41 @@ function Used() {
     }
   };
 
+  const deleteComponent = (componente) => {
+    Swal.fire({
+      title: `Deseas eliminar el consumo de ${componente.componentes.componentes_categories.name} - ${componente.componentes.measures}?`,
+      text: "Toda la información relacionada con el componente será eliminada!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      cancelButtonText: "Cancelar",
+      confirmButtonText: "Si, Borrar!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        instance
+          .delete(`/componentes/used/${componente.id}`)
+          .then((response) => {
+            getComponentes();
+            Swal.fire(
+              "Eliminado!",
+              "El componente se elimino correctamente.",
+              "success"
+            );
+          })
+          .catch((error) => {
+            console.error(error);
+            getComponentes();
+            Swal.fire({
+              title: "Error",
+              text: "Ha ocurrido un error al eliminar el componente",
+              icon: "error",
+            });
+          });
+      }
+    });
+  };
+
   const renderComponentes = () => {
     return componentes.map((componente) => (
       <Table.Row className="bg-white" key={componente.id}>
@@ -151,26 +281,32 @@ function Used() {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <p className="-mb-0.5 text-body-4 font-medium text-metal-600">
-                  {componente.measures}
+                  {componente.componentes.measures}
                 </p>
               </div>
             </div>
           </div>
         </Table.Cell>
         <Table.Cell>
-          <Badge color="secondary">{componente.quantity}</Badge>
+          <Badge color="secondary">{componente?.quantity}</Badge>
         </Table.Cell>
         <Table.Cell>
-          <Badge>{componente.category}</Badge>
+          <BadgeComponent>
+            {componente?.componentes?.componentes_categories?.name}
+          </BadgeComponent>
         </Table.Cell>
         <Table.Cell>
-          <Badge>{componente.hospital}</Badge>
+          <BadgeComponent>
+            {componente?.hospitals?.name
+              ? componente.hospitals.name
+              : "No Aplica"}
+          </BadgeComponent>
         </Table.Cell>
         <Table.Cell>
-          <p>{componente.patient}</p>
+          <p>{componente?.patient}</p>
         </Table.Cell>
         <Table.Cell>
-          <p>{new Date(componente.registration_date).toDateString()}</p>
+          <p>{new Date(componente?.used_date).toLocaleDateString()}</p>
         </Table.Cell>
         <Table.Cell>
           <Dropdown
@@ -217,10 +353,10 @@ function Used() {
     try {
       await instance.post("/componentes/add/used", {
         componente_id: dataNewRegister.componente,
-        hospital_id: dataNewRegister.hospital,
+        hospital_id: parseInt(dataNewRegister.hospital),
         patient: dataNewRegister.patient,
-        quantity: dataNewRegister.quantity,
-        registration_date: dataNewRegister.registration_date,
+        quantity: parseInt(dataNewRegister.quantity),
+        used_date: new Date(dataNewRegister.used_date),
       });
       getComponentes();
 
@@ -270,15 +406,19 @@ function Used() {
                 className="text-body-4 font-normal text-metal-600"
               >
                 <div className="flex gap-4 flex-col mt-4">
-                  <DatePicker
-                    name="date"
-                    singleDate={handleChange}
-                    placeholder="Date / Month / Year"
-                  >
-                    <DatePicker.SingleDate />
-                  </DatePicker>
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="used_date">Fecha de uso</Label>
+                    <input
+                      autoComplete="off"
+                      type="date"
+                      name="used_date"
+                      // value={formatDateInput(dataNewRegister.used_date)}
+                      onChange={handleChange}
+                    />
+                  </div>
                   <div>
                     <Input
+                      autoComplete="off"
                       placeholder="Buscar por medida o categoria..."
                       type="text"
                       value={dataNewRegister.nameComponente}
@@ -287,7 +427,7 @@ function Used() {
                     />
                     {searchActive && (
                       <div className="absolute bg-slate-100 shadow-sm z-10 rounded p-3 border-blue-100">
-                        <p>Escribe una medida o categoría...</p>
+                        <p>Buscar componente por medida o categoría...</p>
                         {searchComponentes.map((componente) => (
                           <div
                             key={componente.id}
@@ -296,7 +436,7 @@ function Used() {
                           >
                             <div className="flex gap-2">
                               <p>{componente.measures}</p>
-                              <p>{componente.category}</p>
+                              <p>{componente.componentes_categories.name}</p>
                               <p>Lote: {componente.lote}</p>
                               <p>
                                 Caducidad:{" "}
@@ -354,9 +494,6 @@ function Used() {
                           <Plus size={16} color="#455468" />
                         </NumberInput.Button>
                       </NumberInput>
-                      {/* <p className="text-body-4 font-normal text-metal-600">
-                        La cantidad maximá es de {dataNewRegister.stock}
-                      </p> */}
                     </fieldset>
                   )}
                   <select name="hospital" id="hospital" onChange={handleChange}>
@@ -368,6 +505,7 @@ function Used() {
                     ))}
                   </select>
                   <Input
+                    autoComplete="off"
                     placeholder="Nombre del Paciente"
                     type="text"
                     name="patient"
@@ -386,14 +524,147 @@ function Used() {
             >
               Cancelar
             </Button>
-            <Button onClick={sendNewRegister} size="sm" color="primary">
-              Confirmar
+            {sendingForm ? (
+              <Button size="sm">
+                <span className="pr-2">
+                  <Spinner color="info" size="sm" />
+                </span>
+                Agregando...
+              </Button>
+            ) : (
+              <Button size="sm" color="primary" onClick={sendNewRegister}>
+                Confirmar
+              </Button>
+            )}
+          </Modal.Footer>
+        </Modal.Body>
+      </Modal>
+
+      <Modal isOpen={modalUpdateOpen} onClose={closeModalUpdate}>
+        <Modal.Body className="space-y-3">
+          <Modal.Icon>
+            <CloudArrowUp size={28} color="#1B4DFF" />
+          </Modal.Icon>
+          <Modal.Content>
+            <Typography variant="div" className="!mb-6">
+              <Typography
+                variant="h3"
+                className="mb-2 text-body-1 font-medium text-metal-900"
+              >
+                Actualizar consumo
+              </Typography>
+              <Typography
+                variant="p"
+                className="text-body-4 font-normal text-metal-600"
+              >
+                <div className="flex gap-4 flex-col mt-4">
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="used_date">Fecha de uso</Label>
+                    <input
+                      type="date"
+                      name="used_date"
+                      // value={formatDateInput(dataNewRegister.used_date)}
+                      onChange={handleChangeUpdate}
+                    />
+                  </div>
+
+                  <fieldset className="space-y-1">
+                    <Label>Cantidad Utilizada</Label>
+                    <NumberInput>
+                      <NumberInput.Button
+                        onClick={() =>
+                          setComponentToUpdate({
+                            ...componentToUpdate,
+                            quantity:
+                              componentToUpdate.quantity - 1 < 1
+                                ? 1
+                                : componentToUpdate.quantity - 1,
+                          })
+                        }
+                      >
+                        <Minus size={16} color="#455468" />
+                      </NumberInput.Button>
+                      <NumberInput.Input
+                        onChange={handleChangeUpdate}
+                        defaultValue={componentToUpdate.quantity}
+                        value={componentToUpdate.quantity}
+                        name="quantityUpdate"
+                        id="quantityUpdate"
+                      />
+                      <NumberInput.Button
+                        onClick={() => {
+                          setComponentToUpdate({
+                            ...componentToUpdate,
+                            quantity: checkStockUpdate(
+                              componentToUpdate.quantity + 1
+                            ),
+                          });
+                        }}
+                      >
+                        <Plus size={16} color="#455468" />
+                      </NumberInput.Button>
+                    </NumberInput>
+                    <p className="text-body-4 font-normal text-metal-600">
+                      Stock restante de{" "}
+                      {
+                        componentToUpdate.componentes?.componentes_categories
+                          ?.name
+                      }{" "}
+                      {componentToUpdate.componentes?.measures}
+                      {" - "}
+                      {componentToUpdate.componentes?.stock} unidades
+                    </p>
+                  </fieldset>
+
+                  <fieldset className="space-y-1 flex flex-col">
+                    <Label>Hospital</Label>
+                    <select
+                      name="hospital"
+                      id="hospital"
+                      value={componentToUpdate.hospital}
+                      onChange={handleChangeUpdate}
+                    >
+                      <option value="Categoria">Seleccionar Hospital</option>
+                      {selectHospitals.map((hospital) => (
+                        <option value={hospital.id} key={hospital.id}>
+                          {hospital.name}
+                        </option>
+                      ))}
+                    </select>
+                  </fieldset>
+                  <fieldset className="max-w-md space-y-1">
+                    <Label htmlFor="patient">Paciente</Label>
+                    <Input
+                      placeholder="Actualizar paciente"
+                      type="text"
+                      name="patient"
+                      value={componentToUpdate.patient}
+                      onChange={handleChangeUpdate}
+                    />
+                  </fieldset>
+                </div>
+              </Typography>
+            </Typography>
+          </Modal.Content>
+          <Modal.Footer className="flex flex-row justify-end">
+            <Button
+              onClick={closeModalUpdate}
+              size="sm"
+              variant="outline"
+              color="secondary"
+            >
+              Cancelar
+            </Button>
+            <Button onClick={sendFormUpdate} size="sm" color="primary">
+              Actualizar
             </Button>
           </Modal.Footer>
         </Modal.Body>
       </Modal>
+
       <h1>Cosumo</h1>
-      <Table showCheckbox={true}>
+
+      <Table>
         <Table.Caption>
           <div className="my-5 flex items-center px-6">
             <div className="flex items-center gap-5">
@@ -443,20 +714,28 @@ function Used() {
           </div>
         </Table.Caption>
 
-        <Table.Head>
-          <Table.HeadCell>
-            <p className="text-body-5 font-medium text-metal-400">Medidas</p>
-          </Table.HeadCell>
-          <Table.HeadCell>Cantidad</Table.HeadCell>
-          <Table.HeadCell>Categoría</Table.HeadCell>
-          <Table.HeadCell>Hospital</Table.HeadCell>
-          <Table.HeadCell>Paciente</Table.HeadCell>
-          <Table.HeadCell>Fecha Consumo</Table.HeadCell>
-          <Table.HeadCell />
-        </Table.Head>
-        <Table.Body className="divide-gray-25 divide-y">
-          {renderComponentes()}
-        </Table.Body>
+        {loading ? (
+          <SkeletonTable />
+        ) : (
+          <>
+            <Table.Head>
+              <Table.HeadCell>
+                <p className="text-body-5 font-medium text-metal-400">
+                  Medidas
+                </p>
+              </Table.HeadCell>
+              <Table.HeadCell>Cantidad</Table.HeadCell>
+              <Table.HeadCell>Categoría</Table.HeadCell>
+              <Table.HeadCell>Hospital</Table.HeadCell>
+              <Table.HeadCell>Paciente</Table.HeadCell>
+              <Table.HeadCell>Fecha Consumo</Table.HeadCell>
+              <Table.HeadCell />
+            </Table.Head>
+            <Table.Body className="divide-gray-25 divide-y">
+              {renderComponentes()}
+            </Table.Body>
+          </>
+        )}
       </Table>
       <PaginationComponent
         currentPage={paramsAPI.page}

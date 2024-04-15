@@ -1,7 +1,15 @@
 import axios from "axios";
 
 export const instance = axios.create({
-  baseURL: "https://emails-server.fly.dev",
+  baseURL: "https://oltech-backend.onrender.com",
 
-  // baseURL: "http://localhost:8080",
+  // baseURL: "http://localhost:3000",
 });
+
+export const setTokenHeaderAPI = (token) => {
+  instance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+};
+
+export const removeTokenHeaderAPI = () => {
+  delete instance.defaults.headers.common["Authorization"];
+};

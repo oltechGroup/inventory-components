@@ -3,8 +3,10 @@ import {
   Database,
   FilePlus,
   FirstAid,
+  FolderLock,
   List,
   MagnifyingGlass,
+  SignIn,
   SquaresFour,
 } from "phosphor-react";
 import {
@@ -18,10 +20,30 @@ import {
 } from "keep-react";
 import { NavLink } from "react-router-dom";
 import { routes } from "../utils/routes";
+import { useAuth } from "../context/AuthProvider";
+import Swal from "sweetalert2";
 
 export const SidebarComponent = () => {
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    Swal.fire({
+      title: "¿Estas seguro que quieres salir?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Si, salir!",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        logout();
+      }
+    });
+  };
+
   return (
-    <Sidebar className="fixed left-0 top-0 h-screen">
+    <Sidebar className="fixed left-0 top-0 h-screen w-72">
       <Sidebar.Header className="space-y-2.5">
         <div className="flex items-center justify-between">
           <Typography
@@ -49,7 +71,7 @@ export const SidebarComponent = () => {
         </div>
       </Sidebar.Header>
       <Sidebar.Body>
-        <NavLink to={routes.dashboard}>
+        <NavLink to={routes.home}>
           <Sidebar.Item>
             <SquaresFour size={24} />
             Inicio
@@ -60,6 +82,13 @@ export const SidebarComponent = () => {
           <Sidebar.Item>
             <FilePlus size={24} />
             Consumo
+          </Sidebar.Item>
+        </NavLink>
+
+        <NavLink to={routes.remisiones}>
+          <Sidebar.Item>
+            <FolderLock size={24} />
+            Remisiones
           </Sidebar.Item>
         </NavLink>
 
@@ -84,28 +113,10 @@ export const SidebarComponent = () => {
           </Sidebar.Item>
         </NavLink>
 
-        {/*<NavLink to={routes.create}>
-          <Sidebar.Item>
-            <ArchiveTray size={24} />
-            Añadir
-          </Sidebar.Item>
-        </NavLink>
-
-         <NavLink>
-          <Sidebar.Item>
-            <Gear size={24} />
-            Settings
-          </Sidebar.Item>
-        </NavLink>
-
-        <Sidebar.Item>
-          <Users size={24} />
-          Users
-        </Sidebar.Item>
-        <Sidebar.Item>
+        <Sidebar.Item onClick={handleLogout} className="cursor-pointer">
           <SignIn size={24} />
-          Log Out
-        </Sidebar.Item> */}
+          Cerrar Sesión
+        </Sidebar.Item>
       </Sidebar.Body>
       <Divider className="my-3" />
       <Sidebar.Footer className="flex items-center gap-2">
@@ -117,13 +128,13 @@ export const SidebarComponent = () => {
             variant="p"
             className="mb-0 text-body-3 font-medium text-metal-600"
           >
-            Oltech
+            {user?.name} {user?.lastname}
           </Typography>
           <Typography
             variant="p"
             className="text-body-4 font-normal text-metal-400"
           >
-            Admin
+            {user?.role}
           </Typography>
         </div>
       </Sidebar.Footer>

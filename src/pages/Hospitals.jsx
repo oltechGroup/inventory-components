@@ -27,9 +27,7 @@ import Swal from "sweetalert2";
 
 function Hospitals() {
   const [dataNewHospital, setDataNewHospital] = useState({
-    measures: "",
-    category: "",
-    stock: 0,
+    name: "",
   });
 
   const [hospitals, setHospitals] = useState([]);
@@ -57,10 +55,7 @@ function Hospitals() {
   const sendFormUpdate = async () => {
     try {
       closeModalUpdate();
-      await instance.put(
-        `/hospitals/update/${hospitalToUpdate.id}`,
-        hospitalToUpdate
-      );
+      await instance.put(`/hospitals/${hospitalToUpdate.id}`, hospitalToUpdate);
       getHospitals();
       Swal.fire({
         title: "Actualizado",
@@ -86,7 +81,7 @@ function Hospitals() {
   };
 
   const getHospitals = () => {
-    instance.get("/hospitals/all").then((response) => {
+    instance.get("/hospitals").then((response) => {
       setHospitals(response.data.data);
       setHospitalsInfo(response.data.info);
     });
@@ -105,7 +100,7 @@ function Hospitals() {
     }).then((result) => {
       if (result.isConfirmed) {
         instance
-          .delete(`/hospitals/delete/${hospital.id}`)
+          .delete(`/hospitals/${hospital.id}`)
           .then((response) => {
             getHospitals();
             Swal.fire(
@@ -116,13 +111,10 @@ function Hospitals() {
           })
           .catch((error) => {
             console.error(error);
-            // TODO: Arreglar error que muestra al eliminar un hospital
-            // Por ahora muestro el mensaje de exito
-            getHospitals();
             Swal.fire(
-              "Eliminado!",
-              "El hospital se elimino correctamente.",
-              "success"
+              "Error",
+              "Ha ocurrido un error al eliminar el hospital",
+              "error"
             );
           });
       }
@@ -140,7 +132,7 @@ function Hospitals() {
     try {
       closeModal();
 
-      await instance.post("/hospitals/add", dataNewHospital);
+      await instance.post("/hospitals", dataNewHospital);
       getHospitals();
       Swal.fire({
         title: "Creado",
@@ -316,7 +308,7 @@ function Hospitals() {
                 Hospitales Registrados
               </p>
               <Badge size="sm" color="secondary">
-                {hospitalsInfo.count} Hospitales
+                {hospitalsInfo.totalCount} Hospitales
               </Badge>
             </div>
             <div className="flex ml-5 items-center gap-5">

@@ -1,12 +1,11 @@
-import Home from "./pages/Home";
+import AuthProvider from "./context/AuthProvider";
+import AppRouter from "./router/AppRouter";
 
 function App() {
-
-  // The reason for the return of component in this file si for react router to work
   return (
-    <>
-      <Home />
-    </>
+    <AuthProvider>
+      <AppRouter />
+    </AuthProvider>
   );
 }
 

@@ -1,25 +1,24 @@
 import {
-  Avatar,
   Badge,
   Button,
-  Popover,
   Table,
   Modal,
   Typography,
   Input,
   Dropdown,
   Icon,
-  DatePicker,
   Label,
+  NumberInput,
 } from "keep-react";
 import {
-  ArrowDown,
   Cube,
   DotsThreeOutline,
   Pencil,
   Trash,
   CloudArrowUp,
   MagnifyingGlass,
+  Minus,
+  Plus,
 } from "phosphor-react";
 
 import { useEffect, useState } from "react";
@@ -27,8 +26,11 @@ import { instance } from "../api/instance";
 
 import Swal from "sweetalert2";
 import PaginationComponent from "../components/Pagination";
+import { SkeletonTable } from "../components/SkeletonTable";
 
 function Store() {
+  const [loading, setLoading] = useState(true);
+
   const [paramsAPI, setParamsAPI] = useState({
     page: 1,
     perPage: 20,
@@ -53,7 +55,6 @@ function Store() {
 
   const [componentes, setComponentes] = useState([]);
   const [componentesInfo, setComponentesInfo] = useState({});
-console.log(componentesInfo);
   const [isOpen, setIsOpen] = useState(false);
 
   // states for update component
@@ -76,10 +77,13 @@ console.log(componentesInfo);
   const sendFormUpdate = async () => {
     try {
       closeModalUpdate();
-      await instance.put(
-        `/componentes/update/${componentToUpdate.id}`,
-        componentToUpdate
-      );
+      await instance.put(`/componentes/${componentToUpdate.id}`, {
+        measures: componentToUpdate.measures,
+        category: componentToUpdate.category,
+        stock: parseInt(componentToUpdate.stock),
+        lote: componentToUpdate.lote,
+        caducidad: new Date(componentToUpdate.caducidad),
+      });
       getComponents();
       Swal.fire({
         title: "Actualizado",
@@ -112,15 +116,19 @@ console.log(componentesInfo);
   };
 
   const getComponents = () => {
-    instance.get("/componentes/all", { params: paramsAPI }).then((response) => {
-      setComponentes(response.data.data);
-      setComponentesInfo(response.data.info);
-    });
+    setLoading(true);
+    instance
+      .get("/componentes", { params: paramsAPI })
+      .then((response) => {
+        setComponentes(response.data.data);
+        setComponentesInfo(response.data.info);
+      })
+      .finally(() => setLoading(false));
   };
 
   const deleteComponent = (componente) => {
     Swal.fire({
-      title: `¿Eliminar ${componente.measures} ${componente.category}?`,
+      title: `¿Eliminar ${componente.measures} ${componente.componentes_categories.name}?`,
       text: "Toda la información relacionada con el componente será eliminada!",
       icon: "warning",
       showCancelButton: true,
@@ -131,7 +139,7 @@ console.log(componentesInfo);
     }).then((result) => {
       if (result.isConfirmed) {
         instance
-          .delete(`/componentes/delete/${componente.id}`)
+          .delete(`/componentes/${componente.id}`)
           .then((response) => {
             getComponents();
             Swal.fire(
@@ -142,14 +150,12 @@ console.log(componentesInfo);
           })
           .catch((error) => {
             console.error(error);
-            // TODO: Arreglar error que muestra al eliminar un componente
-            // Por ahora muestro el mensaje de exito
             getComponents();
-            Swal.fire(
-              "Eliminado!",
-              "El componente se elimino correctamente.",
-              "success"
-            );
+            Swal.fire({
+              title: "Error",
+              text: "Ha ocurrido un error al eliminar el componente",
+              icon: "error",
+            });
           });
       }
     });
@@ -165,8 +171,13 @@ console.log(componentesInfo);
   const sendForm = async () => {
     try {
       closeModal();
-
-      await instance.post("/componentes/add", dataNewComponent);
+      await instance.post("/componentes/add", {
+        measures: dataNewComponent.measures,
+        category: dataNewComponent.category,
+        stock: parseInt(dataNewComponent.stock),
+        lote: dataNewComponent.lote,
+        caducidad: new Date(dataNewComponent.caducidad),
+      });
       getComponents();
       Swal.fire({
         title: "Creado",
@@ -199,32 +210,32 @@ console.log(componentesInfo);
         </Table.Cell>
         <Table.Cell>
           <Badge color="secondary">{componente.stock}</Badge>
+          {componente.remission_stock > 0 && (
+            <Badge color="warning" className="ml-2">
+              {componente.remission_stock} Rem.
+            </Badge>
+          )}
         </Table.Cell>
         <Table.Cell>
-          <Badge>{componente.category}</Badge>
+          <Badge>{componente.componentes_categories.name}</Badge>
+        </Table.Cell>
+        <Table.Cell>
+          <p>{new Date(
+            componente.registration_date.split("-")[0],
+            componente.registration_date.split("-")[1],
+            componente.registration_date.split("-")[2].split("T")[0]
+          ).toLocaleDateString()}</p>
+        </Table.Cell>
+        <Table.Cell>
+          <Badge color="success">{componente.lote}</Badge>
         </Table.Cell>
         <Table.Cell>
           <p>
-            {new Date(componente.registration_date).toLocaleDateString(
-              "es-MX",
-              {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              }
-            )}
-          </p>
-        </Table.Cell>
-        <Table.Cell>
-          <Badge color="warning">{componente.lote}</Badge>
-        </Table.Cell>
-        <Table.Cell>
-          <p>
-            {new Date(componente.caducidad).toLocaleDateString("es-MX", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
+            {new Date(
+              componente.caducidad.split("-")[0],
+              componente.caducidad.split("-")[1],
+              componente.caducidad.split("-")[2].split("T")[0]
+            ).toLocaleDateString()}
           </p>
         </Table.Cell>
         <Table.Cell>
@@ -275,8 +286,6 @@ console.log(componentesInfo);
     window.scrollTo(0, 0);
   }, [paramsAPI]);
 
-  console.log(paramsAPI);
-
   return (
     <>
       <Modal isOpen={isOpen} onClose={closeModal}>
@@ -297,17 +306,19 @@ console.log(componentesInfo);
                 className="text-body-4 font-normal text-metal-600"
               >
                 <div className="flex gap-4 flex-col mt-4">
-                  <Input
-                    placeholder="Medidas"
-                    name="measures"
-                    type="text"
-                    onChange={handleChange}
-                  />
+                  <select name="category" onChange={handleChange}>
+                    <option value="1">Seleccionar Categoria</option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
                   <div className="flex gap-4">
                     <Input
-                      placeholder="Cantidad"
-                      name="stock"
-                      type="number"
+                      placeholder="Medidas"
+                      name="measures"
+                      type="text"
                       onChange={handleChange}
                     />
                     <Input
@@ -325,15 +336,38 @@ console.log(componentesInfo);
                       onChange={handleChange}
                     />
                   </div>
-
-                  <select name="category" onChange={handleChange}>
-                    <option value="1">Seleccionar Categoria</option>
-                    {categories.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
+                  <fieldset className="max-w-md space-y-1">
+                    <Label htmlFor="stock">Cantidad</Label>
+                    <NumberInput>
+                      <NumberInput.Button
+                        onClick={() =>
+                          setDataNewComponent({
+                            ...dataNewComponent,
+                            stock: dataNewComponent.stock - 1,
+                          })
+                        }
+                      >
+                        <Minus size={16} color="#455468" />
+                      </NumberInput.Button>
+                      <NumberInput.Input
+                        defaultValue={0}
+                        name="stock"
+                        type="number"
+                        value={dataNewComponent.stock}
+                        onChange={handleChange}
+                      />
+                      <NumberInput.Button
+                        onClick={() =>
+                          setDataNewComponent({
+                            ...dataNewComponent,
+                            stock: dataNewComponent.stock + 1,
+                          })
+                        }
+                      >
+                        <Plus size={16} color="#455468" />
+                      </NumberInput.Button>
+                    </NumberInput>
+                  </fieldset>
                 </div>
               </Typography>
             </Typography>
@@ -371,21 +405,8 @@ console.log(componentesInfo);
                 variant="p"
                 className="text-body-4 font-normal text-metal-600"
               >
-                <div className="flex gap-4 flex-col mt-4">
-                  <Input
-                    placeholder="Medidas"
-                    name="measures"
-                    type="text"
-                    value={componentToUpdate.measures}
-                    onChange={handleChangeUpdate}
-                  />
-                  <Input
-                    placeholder="Cantidad"
-                    name="stock"
-                    type="text"
-                    value={componentToUpdate.stock}
-                    onChange={handleChangeUpdate}
-                  />
+                <fieldset className="flex flex-col max-w-md space-y-1">
+                  <Label htmlFor="category">Categoría</Label>
                   <select name="category" onChange={handleChangeUpdate}>
                     {categories.map((category) => (
                       <option
@@ -397,6 +418,75 @@ console.log(componentesInfo);
                       </option>
                     ))}
                   </select>
+                </fieldset>
+                <div className="flex gap-4 flex-col mt-4">
+                  <div className="flex gap-2">
+                    <fieldset className="max-w-md space-y-1">
+                      <Label htmlFor="measures">Medidas</Label>
+                      <Input
+                        placeholder="Actualizar medidas"
+                        id="measures"
+                        name="measures"
+                        type="text"
+                        value={componentToUpdate.measures}
+                        onChange={handleChangeUpdate}
+                      />
+                    </fieldset>
+                    <fieldset className="max-w-md space-y-1">
+                      <Label htmlFor="lote">Lote</Label>
+                      <Input
+                        placeholder="Actualizar lote"
+                        id="lote"
+                        name="lote"
+                        type="text"
+                        value={componentToUpdate.lote}
+                        onChange={handleChangeUpdate}
+                      />
+                    </fieldset>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="caducidad">Fecha de Caducidad</Label>
+                    <input
+                      type="date"
+                      name="caducidad"
+                      // value={formatDateInput(componentToUpdate.caducidad)}
+                      onChange={handleChangeUpdate}
+                    />
+                  </div>
+
+                  <fieldset className="max-w-md space-y-1">
+                    <Label htmlFor="stock">Cantidad</Label>
+                    <NumberInput>
+                      <NumberInput.Button
+                        onClick={() =>
+                          setComponentToUpdate({
+                            ...componentToUpdate,
+                            stock: componentToUpdate.stock - 1,
+                          })
+                        }
+                      >
+                        <Minus size={16} color="#455468" />
+                      </NumberInput.Button>
+                      <NumberInput.Input
+                        defaultValue={0}
+                        name="stock"
+                        type="number"
+                        value={componentToUpdate.stock}
+                        onChange={handleChangeUpdate}
+                      />
+                      <NumberInput.Button
+                        onClick={() =>
+                          setComponentToUpdate({
+                            ...componentToUpdate,
+                            stock: componentToUpdate.stock + 1,
+                          })
+                        }
+                      >
+                        <Plus size={16} color="#455468" />
+                      </NumberInput.Button>
+                    </NumberInput>
+                  </fieldset>
                 </div>
               </Typography>
             </Typography>
@@ -416,7 +506,7 @@ console.log(componentesInfo);
               size="sm"
               color="primary"
             >
-              Confirmar
+              Actualizar
             </Button>
           </Modal.Footer>
         </Modal.Body>
@@ -430,7 +520,7 @@ console.log(componentesInfo);
                 Componentes Registrados
               </p>
               <Badge size="sm" color="secondary">
-                {componentesInfo.count} Componentes
+                {componentesInfo.totalCount} Componentes
               </Badge>
             </div>
             <div className="flex ml-5 items-center gap-5">
@@ -472,21 +562,29 @@ console.log(componentesInfo);
           </div>
         </Table.Caption>
 
-        <Table.Head>
-          <Table.HeadCell>
-            <p className="text-body-5 font-medium text-metal-400">Medidas</p>
-          </Table.HeadCell>
-          <Table.HeadCell>En Stock</Table.HeadCell>
-          <Table.HeadCell>Categoría</Table.HeadCell>
-          <Table.HeadCell>Fecha Registro</Table.HeadCell>
-          <Table.HeadCell>Lote</Table.HeadCell>
-          <Table.HeadCell>Caducidad</Table.HeadCell>
+        {loading ? (
+          <SkeletonTable />
+        ) : (
+          <>
+            <Table.Head>
+              <Table.HeadCell>
+                <p className="text-body-5 font-medium text-metal-400">
+                  Medidas
+                </p>
+              </Table.HeadCell>
+              <Table.HeadCell>En Stock</Table.HeadCell>
+              <Table.HeadCell>Categoría</Table.HeadCell>
+              <Table.HeadCell>Fecha Registro</Table.HeadCell>
+              <Table.HeadCell>Lote</Table.HeadCell>
+              <Table.HeadCell>Caducidad</Table.HeadCell>
 
-          <Table.HeadCell />
-        </Table.Head>
-        <Table.Body className="divide-gray-25 divide-y">
-          {renderComponentes()}
-        </Table.Body>
+              <Table.HeadCell />
+            </Table.Head>
+            <Table.Body className="divide-gray-25 divide-y">
+              {renderComponentes()}
+            </Table.Body>
+          </>
+        )}
       </Table>
       <PaginationComponent
         currentPage={paramsAPI.page}

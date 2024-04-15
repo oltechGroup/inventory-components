@@ -1,19 +1,25 @@
 import { useEffect, useState } from "react";
 import { instance } from "../api/instance";
 import { BarChart, AreaChart, Badge } from "keep-react";
+import { Cube } from "phosphor-react";
+import { SkeletonCharts } from "../components/SkeletonCharts";
 
 function Dashboard() {
   const [stadistics, setStadistics] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const getStadicstics = () => {
-    instance.get("/componentes/statistics").then((response) => {
-      setStadistics(response.data);
-    });
+    instance
+      .get("/componentes/stadistics")
+      .then((response) => {
+        setStadistics(response.data);
+      })
+      .finally(() => setLoading(false));
   };
 
-  const barChartData = stadistics.countComponetesByCategory?.map((item) => ({
+  const barChartData = stadistics.arrayCountByCategory?.map((item) => ({
     name: item.category,
-    cantidad: parseInt(item.count),
+    cantidad: parseInt(item.sum),
   }));
 
   const chartData = stadistics.stadisticsInventory?.map((item) => ({
@@ -21,8 +27,6 @@ function Dashboard() {
     sell: parseInt(item.quantity),
   }));
 
-
-  console.log(stadistics);
   useEffect(() => getStadicstics(), []);
 
   return (
@@ -30,38 +34,57 @@ function Dashboard() {
       <div className="flex items-center gap-6">
         <h1>Dashboard</h1>
         <Badge color="secondary">
-          {stadistics?.countComponents?.count} Componentes Totales
+          {stadistics?.countComponentes?._sum.stock} Componentes Totales
         </Badge>
       </div>
 
-      <Badge className="absolute mt-10">Inventario</Badge>
-      <AreaChart chartData={chartData} dataKey="sell" showTooltip={true} chartType="natural" />
+      {loading ? (
+        <SkeletonCharts />
+      ) : (
+        <>
+          <Badge className="absolute mt-10">Inventario</Badge>
+          <AreaChart
+            chartData={chartData}
+            dataKey="sell"
+            showTooltip={true}
+            chartType="natural"
+          />
 
-      <section className="flex gap-6 flex-wrap mb-6">
-        {stadistics.countComponetesByCategory?.map((item, index) => (
-          <div
-            key={index}
-            className="flex flex-col items-end shadow-medium p-4 rounded-md border border-cyan-50"
-          >
-            <h3>{item.category}</h3>
-            <p className="font-bold text-4xl">{item.count}</p>
-          </div>
-        ))}
-      </section>
+          <section className="flex gap-6 flex-wrap mb-6">
+            {stadistics.arrayCountByCategory?.map((item, index) => (
+              <div
+                key={index}
+                className={`flex flex-col items-end shadow-medium p-4 rounded-md border border-cyan-50 ${item.sum === 0 && "bg-red-400 text-white"}`}
+              >
+                <div className="flex gap-2">
+                  <Badge color="secondary" size="sm">
+                    {index}
+                  </Badge>
+                  <Cube size={24} />
+                  <h3>{item.category}</h3>
+                </div>
+                <div>
+                  <p className="font-bold text-4xl">{item.sum}</p>
+                </div>
+              </div>
+            ))}
+          </section>
 
-      <BarChart
-        height={300}
-        width={700}
-        barSize={30}
-        barRadius={[4, 4, 0, 0]}
-        dataKey="cantidad"
-        chartData={barChartData}
-        showBg={true}
-        showLegend={true}
-        showTooltip={true}
-        showXaxis={true}
-        showYaxis={true}
-      />
+          <BarChart
+            height={300}
+            width={700}
+            barSize={30}
+            barRadius={[4, 4, 0, 0]}
+            dataKey="cantidad"
+            chartData={barChartData}
+            showBg={true}
+            showLegend={true}
+            showTooltip={true}
+            showXaxis={true}
+            showYaxis={true}
+          />
+        </>
+      )}
     </div>
   );
 }
