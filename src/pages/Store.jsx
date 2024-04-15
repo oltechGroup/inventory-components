@@ -1,20 +1,16 @@
 import {
-  Avatar,
   Badge,
   Button,
-  Popover,
   Table,
   Modal,
   Typography,
   Input,
   Dropdown,
   Icon,
-  DatePicker,
   Label,
   NumberInput,
 } from "keep-react";
 import {
-  ArrowDown,
   Cube,
   DotsThreeOutline,
   Pencil,
@@ -30,7 +26,6 @@ import { instance } from "../api/instance";
 
 import Swal from "sweetalert2";
 import PaginationComponent from "../components/Pagination";
-import { formatDateInput } from "../utils/dateFunctions";
 import { SkeletonTable } from "../components/SkeletonTable";
 
 function Store() {
@@ -215,27 +210,33 @@ function Store() {
         </Table.Cell>
         <Table.Cell>
           <Badge color="secondary">{componente.stock}</Badge>
+          {componente.remission_stock > 0 && (
+            <Badge color="warning" className="ml-2">
+              {componente.remission_stock} Rem.
+            </Badge>
+          )}
         </Table.Cell>
         <Table.Cell>
           <Badge>{componente.componentes_categories.name}</Badge>
         </Table.Cell>
         <Table.Cell>
-          <p>
-            {new Date(componente.registration_date).toLocaleDateString(
-              "es-MX",
-              {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              }
-            )}
-          </p>
+          <p>{new Date(
+            componente.registration_date.split("-")[0],
+            componente.registration_date.split("-")[1],
+            componente.registration_date.split("-")[2].split("T")[0]
+          ).toLocaleDateString()}</p>
         </Table.Cell>
         <Table.Cell>
           <Badge color="success">{componente.lote}</Badge>
         </Table.Cell>
         <Table.Cell>
-          <p>{new Date(componente.caducidad).toLocaleDateString()}</p>
+          <p>
+            {new Date(
+              componente.caducidad.split("-")[0],
+              componente.caducidad.split("-")[1],
+              componente.caducidad.split("-")[2].split("T")[0]
+            ).toLocaleDateString()}
+          </p>
         </Table.Cell>
         <Table.Cell>
           <Dropdown

@@ -9,4 +9,5 @@ export const routes = {
   remisiones: "/remisiones",
   addRemision: "/remisiones/add",
   remision: (id) => id ? `/remisiones/${id}` : "/remisiones/:id",
+  generatePDF: "/remisiones/pdf/:id",
 }

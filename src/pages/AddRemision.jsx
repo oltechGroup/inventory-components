@@ -4,6 +4,7 @@ import {
   Label,
   Modal,
   NumberInput,
+  Spinner,
   Table,
   Typography,
 } from "keep-react";
@@ -19,7 +20,11 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { instance } from "../api/instance";
 
+import Swal from "sweetalert2";
+import { routes } from "../utils/routes";
+
 function AddRemision() {
+  // States for modal
   const [isOpen, setIsOpen] = useState(false);
   const [componenteToUpdate, setComponenteToUpdate] = useState({});
   const openModal = (componente) => {
@@ -49,9 +54,14 @@ function AddRemision() {
   const nav = useNavigate();
 
   // States for new Remision
+  const [sendingForm, setSendingForm] = useState(false);
   const [dataNewRegister, setDataNewRegister] = useState({
     name: "",
+    date_remission: "",
     componentes: [],
+    client: "",
+    hospital_id: "",
+    encargado: "",
   });
   const handleChange = (e) => {
     setDataNewRegister({
@@ -86,10 +96,35 @@ function AddRemision() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setSendingForm(true);
 
-    console.log(dataNewRegister);
+    try {
+      const response = await instance.post("componentes/add/remission", {
+        name: dataNewRegister.name,
+        date_remission: dataNewRegister.date_remission,
+        componentes: dataNewRegister.componentes,
+        client: dataNewRegister.client,
+        hospital_id: parseInt(dataNewRegister.hospital_id),
+        encargado: dataNewRegister.encargado,
+      });
+      Swal.fire({
+        title: "Registrado",
+        text: "La remisión ha sido registrada correctamente",
+        icon: "success",
+      });
+      setSendingForm(false);
+      nav(routes.remisiones);
+    } catch (error) {
+      setSendingForm(false);
+      console.log(error);
+      Swal.fire({
+        title: "Error",
+        text: error.response.data.message,
+        icon: "error",
+      });
+    }
   };
   // End states for new Remision
 
@@ -143,6 +178,19 @@ function AddRemision() {
   };
   // End states for search component
 
+  // States for select hospitals
+  const [selectHospitals, setSelectHospitals] = useState([]);
+
+  const getHospitalsSelect = () => {
+    instance.get("/hospitals/select").then((response) => {
+      setSelectHospitals(response.data);
+    });
+  };
+
+  useEffect(() => {
+    getHospitalsSelect();
+  }, []);
+
   return (
     <>
       <div className="flex gap-4 items-center mb-4">
@@ -163,7 +211,7 @@ function AddRemision() {
           <div className="flex gap-4 flex-col mt-4">
             <div className="flex gap-4">
               <fieldset className="max-w-md space-y-1 w-full">
-                <Label htmlFor="name">Nombre de la remisión</Label>
+                <Label htmlFor="name">Nombre de la remisión *</Label>
                 <Input
                   id="name"
                   name="name"
@@ -174,15 +222,56 @@ function AddRemision() {
               </fieldset>
 
               <fieldset className="max-w-md space-y-1 w-full">
-                <Label htmlFor="name">Fecha de la remisión</Label>
+                <Label htmlFor="date_remission">Fecha de la remisión *</Label>
                 <Input
-                  id="date_remision"
-                  name="date_remision"
+                  id="date_remission"
+                  name="date_remission"
                   type="date"
                   onChange={handleChange}
                 />
               </fieldset>
             </div>
+
+            <div className="flex gap-4">
+              <fieldset className="max-w-md space-y-1 w-full">
+                <Label htmlFor="client">Cliente</Label>
+                <Input
+                  id="client"
+                  name="client"
+                  placeholder="Ingresa el cliente"
+                  type="text"
+                  onChange={handleChange}
+                />
+              </fieldset>
+
+              <fieldset className="max-w-md space-y-1 w-full">
+                <Label htmlFor="hospital_id">Hospital</Label>
+                <select
+                  name="hospital_id"
+                  id="hospital_id"
+                  onChange={handleChange}
+                >
+                  <option value="">no aplica</option>
+                  {selectHospitals.map((hospital) => (
+                    <option value={hospital.id} key={hospital.id}>
+                      {hospital.name}
+                    </option>
+                  ))}
+                </select>
+              </fieldset>
+            </div>
+
+            <fieldset className="max-w-md space-y-1 w-full">
+              <Label htmlFor="encargado">Encargado de almacén</Label>
+              <Input
+                id="encargado"
+                name="encargado"
+                className="w-full"
+                placeholder="Ingresa el nombre del encargado"
+                type="text"
+                onChange={handleChange}
+              />
+            </fieldset>
 
             <section className="border rounded-xl p-4 flex flex-col gap-2">
               <p className="text-metal-400 text-body-3 font-medium">
@@ -362,9 +451,18 @@ function AddRemision() {
             >
               Cancelar
             </Button>
-            <Button size="sm" color="primary" onClick={handleSubmit}>
-              Registrar Remisión
-            </Button>
+            {sendingForm ? (
+              <Button size="sm">
+                <span className="pr-2">
+                  <Spinner color="info" size="sm" />
+                </span>
+                Registrando...
+              </Button>
+            ) : (
+              <Button size="sm" color="primary" onClick={handleSubmit}>
+                Registrar Remisión
+              </Button>
+            )}
           </div>
         )}
       </Typography>

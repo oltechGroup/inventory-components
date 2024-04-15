@@ -54,9 +54,12 @@ function Dashboard() {
             {stadistics.arrayCountByCategory?.map((item, index) => (
               <div
                 key={index}
-                className="flex flex-col items-end shadow-medium p-4 rounded-md border border-cyan-50"
+                className={`flex flex-col items-end shadow-medium p-4 rounded-md border border-cyan-50 ${item.sum === 0 && "bg-red-400 text-white"}`}
               >
                 <div className="flex gap-2">
+                  <Badge color="secondary" size="sm">
+                    {index}
+                  </Badge>
                   <Cube size={24} />
                   <h3>{item.category}</h3>
                 </div>

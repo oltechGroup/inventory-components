@@ -12,6 +12,7 @@ import {
   Icon,
   Label,
   NumberInput,
+  Spinner,
 } from "keep-react";
 import {
   ArrowDown,
@@ -35,15 +36,14 @@ import { SkeletonTable } from "../components/SkeletonTable";
 const BadgeComponent = ({ children }) => {
   return (
     <div className="bg-primary-50 px-3 rounded-2xl max-w-max">
-      <p className="font-semibold text-primary-500 text-body-5">
-        {children}
-      </p>
+      <p className="font-semibold text-primary-500 text-body-5">{children}</p>
     </div>
   );
 };
 
 function Used() {
   const [loading, setLoading] = useState(true);
+  const [sendingForm, setSendingForm] = useState(false);
 
   const [paramsAPI, setParamsAPI] = useState({
     page: 1,
@@ -104,6 +104,7 @@ function Used() {
     }
   };
   const sendFormUpdate = async () => {
+    setSendingForm(true);
     try {
       await instance.put(`/componentes/used/${componentToUpdate.id}`, {
         used_date: new Date(componentToUpdate.used_date),
@@ -118,7 +119,9 @@ function Used() {
         text: "El componente ha sido actualizado exitosamente!",
         icon: "success",
       });
+      setSendingForm(false);
     } catch (error) {
+      setSendingForm(false);
       console.error(error);
       Swal.fire({
         title: "Error",
@@ -285,19 +288,25 @@ function Used() {
           </div>
         </Table.Cell>
         <Table.Cell>
-          <Badge color="secondary">{componente.quantity}</Badge>
+          <Badge color="secondary">{componente?.quantity}</Badge>
         </Table.Cell>
         <Table.Cell>
-          <BadgeComponent>{componente.componentes.componentes_categories.name}</BadgeComponent>
+          <BadgeComponent>
+            {componente?.componentes?.componentes_categories?.name}
+          </BadgeComponent>
         </Table.Cell>
         <Table.Cell>
-          <BadgeComponent>{componente.hospitals.name}</BadgeComponent>
+          <BadgeComponent>
+            {componente?.hospitals?.name
+              ? componente.hospitals.name
+              : "No Aplica"}
+          </BadgeComponent>
         </Table.Cell>
         <Table.Cell>
-          <p>{componente.patient}</p>
+          <p>{componente?.patient}</p>
         </Table.Cell>
         <Table.Cell>
-          <p>{new Date(componente.used_date).toLocaleDateString()}</p>
+          <p>{new Date(componente?.used_date).toLocaleDateString()}</p>
         </Table.Cell>
         <Table.Cell>
           <Dropdown
@@ -400,6 +409,7 @@ function Used() {
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="used_date">Fecha de uso</Label>
                     <input
+                      autoComplete="off"
                       type="date"
                       name="used_date"
                       // value={formatDateInput(dataNewRegister.used_date)}
@@ -408,6 +418,7 @@ function Used() {
                   </div>
                   <div>
                     <Input
+                      autoComplete="off"
                       placeholder="Buscar por medida o categoria..."
                       type="text"
                       value={dataNewRegister.nameComponente}
@@ -494,6 +505,7 @@ function Used() {
                     ))}
                   </select>
                   <Input
+                    autoComplete="off"
                     placeholder="Nombre del Paciente"
                     type="text"
                     name="patient"
@@ -512,9 +524,18 @@ function Used() {
             >
               Cancelar
             </Button>
-            <Button onClick={sendNewRegister} size="sm" color="primary">
-              Confirmar
-            </Button>
+            {sendingForm ? (
+              <Button size="sm">
+                <span className="pr-2">
+                  <Spinner color="info" size="sm" />
+                </span>
+                Agregando...
+              </Button>
+            ) : (
+              <Button size="sm" color="primary" onClick={sendNewRegister}>
+                Confirmar
+              </Button>
+            )}
           </Modal.Footer>
         </Modal.Body>
       </Modal>
@@ -643,7 +664,7 @@ function Used() {
 
       <h1>Cosumo</h1>
 
-      <Table showCheckbox={true}>
+      <Table>
         <Table.Caption>
           <div className="my-5 flex items-center px-6">
             <div className="flex items-center gap-5">

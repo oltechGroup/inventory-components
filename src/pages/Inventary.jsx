@@ -68,6 +68,12 @@ function Inventary() {
               Eliminado
             </Badge>
           );
+        case "remision":
+          return (
+            <Badge color="warning" showIcon={true}>
+              Remisión
+            </Badge>
+          );
         default:
           return movimiento;
       }
@@ -85,6 +91,15 @@ function Inventary() {
             </div>
           );
         case "salida":
+          return (
+            <div className="flex items-center gap-1">
+              <span>
+                <ArrowDown size={20} color="#D7DFE9" />
+              </span>
+              <span>{cantidad}</span>
+            </div>
+          );
+        case "remision":
           return (
             <div className="flex items-center gap-1">
               <span>
