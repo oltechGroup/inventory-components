@@ -222,21 +222,13 @@ function Store() {
           <Badge>{componente.componentes_categories.name}</Badge>
         </Table.Cell>
         <Table.Cell>
-          <p>{format({
-            date: componente.registration_date,
-            format: "short",
-          })}</p>
+          <p>{new Date(componente.registration_date).toLocaleDateString()}</p>
         </Table.Cell>
         <Table.Cell>
           <Badge color="success">{componente.lote}</Badge>
         </Table.Cell>
         <Table.Cell>
-          <p>
-            {format({
-              date: componente.caducidad,
-              format: "short",
-            })}
-          </p>
+          <p>{new Date(componente.caducidad).toLocaleDateString()}</p>
         </Table.Cell>
         <Table.Cell>
           <Dropdown
