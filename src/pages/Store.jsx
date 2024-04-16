@@ -84,7 +84,7 @@ function Store() {
         category: componentToUpdate.category,
         stock: parseInt(componentToUpdate.stock),
         lote: componentToUpdate.lote,
-        caducidad: new Date(componentToUpdate.caducidad),
+        caducidad: componentToUpdate.caducidad,
       });
       getComponents();
       Swal.fire({
@@ -219,7 +219,9 @@ function Store() {
           )}
         </Table.Cell>
         <Table.Cell>
-          <Badge size="sm">{(componente.componentes_categories.name).toUpperCase()}</Badge>
+          <Badge size="sm">
+            {componente.componentes_categories.name.toUpperCase()}
+          </Badge>
         </Table.Cell>
         <Table.Cell>
           <p>{new Date(componente.registration_date).toLocaleDateString()}</p>
