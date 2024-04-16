@@ -219,7 +219,7 @@ function Store() {
           )}
         </Table.Cell>
         <Table.Cell>
-          <Badge>{componente.componentes_categories.name}</Badge>
+          <Badge size="sm">{(componente.componentes_categories.name).toUpperCase()}</Badge>
         </Table.Cell>
         <Table.Cell>
           <p>{new Date(componente.registration_date).toLocaleDateString()}</p>
