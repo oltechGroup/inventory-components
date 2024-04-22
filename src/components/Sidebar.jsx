@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Archive,
   Database,
@@ -8,6 +9,7 @@ import {
   MagnifyingGlass,
   SignIn,
   SquaresFour,
+  Users,
 } from "phosphor-react";
 import {
   Avatar,
@@ -22,6 +24,7 @@ import { NavLink } from "react-router-dom";
 import { routes } from "../utils/routes";
 import { useAuth } from "../context/AuthProvider";
 import Swal from "sweetalert2";
+import UserProfile from "../UserProfile";
 
 export const SidebarComponent = () => {
   const { user, logout } = useAuth();
@@ -113,6 +116,13 @@ export const SidebarComponent = () => {
           </Sidebar.Item>
         </NavLink>
 
+        <NavLink to={routes.Users}>
+          <Sidebar.Item>
+            <Users size={24} />
+            Usuarios
+          </Sidebar.Item>
+        </NavLink>
+
         <Sidebar.Item onClick={handleLogout} className="cursor-pointer">
           <SignIn size={24} />
           Cerrar Sesión
@@ -121,15 +131,19 @@ export const SidebarComponent = () => {
       <Divider className="my-3" />
       <Sidebar.Footer className="flex items-center gap-2">
         <div>
-          <Avatar shape="circle" />
+          <Avatar shape="circle" img={user.avatar} />
         </div>
-        <div>
-          <Typography
-            variant="p"
-            className="mb-0 text-body-3 font-medium text-metal-600"
-          >
-            {user?.name} {user?.lastname}
-          </Typography>
+        <div className="flex flex-col items-start">
+          <div className="flex items-center justify-between">
+            <NavLink to={routes.userProfile} className="w-full">
+              <Typography
+                variant="p"
+                className="mb-0 text-body-3 font-medium text-metal-600"
+              >
+                {user?.name} {user?.lastname}
+              </Typography>
+            </NavLink>
+          </div>
           <Typography
             variant="p"
             className="text-body-4 font-normal text-metal-400"
