@@ -10,6 +10,8 @@ import Dashboard from "./Dashboard";
 import Remisiones from "./Remisiones";
 import OneRemision from "./OneRemision";
 import AddRemision from "./AddRemision";
+import Users from "./Users";
+import UserProfile from "../UserProfile";
 
 function Home() {
   return (
@@ -24,6 +26,8 @@ function Home() {
         <Route path={routes.remision()} element={<OneRemision />} />
         <Route path={routes.addRemision} element={<AddRemision />} />
         <Route path={routes.remisiones} element={<Remisiones />} />
+        <Route path={routes.Users} element={<Users />} />
+        <Route path={routes.userProfile} element={<UserProfile/>} />
       </Routes>
     </ContainerSidebar>
   );

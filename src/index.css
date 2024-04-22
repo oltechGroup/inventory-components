@@ -8,6 +8,8 @@
   line-height: 1.5;
   font-weight: 400;
 
+  --color-blue: #0070ef;
+  
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -39,3 +41,63 @@ select {
 select:focus {
   outline: #e2e8f0;
 }
+
+/* Input File */
+.file-select {
+  position: relative;
+  display: inline-block;
+}
+.file-select::before {
+  background-color: var(--color-blue);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  content: 'Seleccionar';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+.file-select input[type="file"] {
+  opacity: 0;
+  width: 200px;
+  height: 32px;
+  display: inline-block;
+}
+#src-file::before {
+  content: 'Sube una foto';
+}
+
+/* Input file secundary */
+  /* Container */
+  .input-file__create {
+    position: relative;
+    color: var(--color-blue);
+    border: 2px dashed var(--color-blue);
+    border-radius: 0.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  /* Input */
+  .input-file__create input[type="file"] {
+    opacity: 0;
+    display: inline-block;
+    height: 8rem;
+  }
+  /* Icon */
+  .input-file__create span {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .input-file__create span svg {
+    width: 3rem;
+    height: 3rem;
+  }
+/* End input file secundary */
+/* End Input File */

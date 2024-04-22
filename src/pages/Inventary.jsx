@@ -93,6 +93,7 @@ function Inventary() {
               <span>{cantidad}</span>
             </div>
           );
+          <div aria-disabled="false" class="inline-flex w-fit items-center font-medium rounded-full cursor-pointer px-2.5 h-5 text-body-4 bg-success-50 text-success-500"><div class="rounded-full h-2 w-2 bg-success-500 mr-1"></div>Entrada</div>
         case "eliminado":
           return (
             <div className="flex items-center gap-1">
@@ -167,6 +168,7 @@ function Inventary() {
                   name="search"
                   onChange={handleSearch}
                 />
+                
                 <Icon>
                   <MagnifyingGlass size={18} color="#AFBACA" />
                 </Icon>
