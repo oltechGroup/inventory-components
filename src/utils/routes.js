@@ -11,4 +11,5 @@ export const routes = {
   addRemision: "/remisiones/add",
   userProfile: "/profile",
   remision: (id) => id ? `/remisiones/${id}` : "/remisiones/:id",
+  generatePDF: "/remisiones/pdf/:id",
 }

@@ -13,6 +13,8 @@ function Login() {
     password: "",
   });
 
+  const loadingSet = (boolean) => setLoading(boolean);
+
   const handleChange = (e) => {
     setUserCredentials({
       ...userCredentials,
@@ -20,14 +22,9 @@ function Login() {
     });
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      setLoading(true);
-      login(userCredentials);
-    } catch (error) {
-      setLoading(false);      
-    }
+    login(userCredentials, loadingSet);
   };
 
   return (

@@ -1,20 +1,16 @@
 import {
-  Avatar,
   Badge,
   Button,
-  Popover,
   Table,
   Modal,
   Typography,
   Input,
   Dropdown,
   Icon,
-  DatePicker,
   Label,
   NumberInput,
 } from "keep-react";
 import {
-  ArrowDown,
   Cube,
   DotsThreeOutline,
   Pencil,
@@ -30,8 +26,9 @@ import { instance } from "../api/instance";
 
 import Swal from "sweetalert2";
 import PaginationComponent from "../components/Pagination";
-import { formatDateInput } from "../utils/dateFunctions";
 import { SkeletonTable } from "../components/SkeletonTable";
+
+import { format } from "@formkit/tempo";
 
 function Store() {
   const [loading, setLoading] = useState(true);
@@ -87,7 +84,7 @@ function Store() {
         category: componentToUpdate.category,
         stock: parseInt(componentToUpdate.stock),
         lote: componentToUpdate.lote,
-        caducidad: new Date(componentToUpdate.caducidad),
+        caducidad: componentToUpdate.caducidad,
       });
       getComponents();
       Swal.fire({
@@ -181,7 +178,7 @@ function Store() {
         category: dataNewComponent.category,
         stock: parseInt(dataNewComponent.stock),
         lote: dataNewComponent.lote,
-        caducidad: new Date(dataNewComponent.caducidad),
+        caducidad: dataNewComponent.caducidad,
       });
       getComponents();
       Swal.fire({
@@ -215,21 +212,19 @@ function Store() {
         </Table.Cell>
         <Table.Cell>
           <Badge color="secondary">{componente.stock}</Badge>
+          {componente.remission_stock > 0 && (
+            <Badge color="warning" className="ml-2">
+              {componente.remission_stock} Rem.
+            </Badge>
+          )}
         </Table.Cell>
         <Table.Cell>
-          <Badge>{componente.componentes_categories.name}</Badge>
+          <Badge size="sm">
+            {componente.componentes_categories.name.toUpperCase()}
+          </Badge>
         </Table.Cell>
         <Table.Cell>
-          <p>
-            {new Date(componente.registration_date).toLocaleDateString(
-              "es-MX",
-              {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              }
-            )}
-          </p>
+          <p>{new Date(componente.registration_date).toLocaleDateString()}</p>
         </Table.Cell>
         <Table.Cell>
           <Badge color="success">{componente.lote}</Badge>

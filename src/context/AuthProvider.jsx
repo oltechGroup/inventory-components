@@ -19,7 +19,8 @@ export default function AuthProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const login = async ({ email, password }) => {
+  const login = async ({ email, password }, loading) => {
+    loading(true);
     try {
       const response = await instance.post("/auth/login", {
         email,
@@ -37,6 +38,7 @@ export default function AuthProvider({ children }) {
 
       return navigate(routes.home);
     } catch (error) {
+      loading(false);
       alert(error.response.data.message);
     }
   };

@@ -68,6 +68,12 @@ function Inventary() {
               Eliminado
             </Badge>
           );
+        case "remision":
+          return (
+            <Badge color="warning" showIcon={true}>
+              Remisión
+            </Badge>
+          );
         default:
           return movimiento;
       }
@@ -93,7 +99,15 @@ function Inventary() {
               <span>{cantidad}</span>
             </div>
           );
-          <div aria-disabled="false" class="inline-flex w-fit items-center font-medium rounded-full cursor-pointer px-2.5 h-5 text-body-4 bg-success-50 text-success-500"><div class="rounded-full h-2 w-2 bg-success-500 mr-1"></div>Entrada</div>
+        case "remision":
+          return (
+            <div className="flex items-center gap-1">
+              <span>
+                <ArrowDown size={20} color="#D7DFE9" />
+              </span>
+              <span>{cantidad}</span>
+            </div>
+          );
         case "eliminado":
           return (
             <div className="flex items-center gap-1">
