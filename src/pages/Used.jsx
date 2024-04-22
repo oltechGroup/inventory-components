@@ -26,7 +26,7 @@ import {
   Plus,
 } from "phosphor-react";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { instance } from "../api/instance";
 
 import Swal from "sweetalert2";
@@ -133,6 +133,21 @@ function Used() {
   // End states for update component
 
   // States for search component
+  const refTableComponentes = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        refTableComponentes.current &&
+        !refTableComponentes.current.contains(e.target)
+      ) {
+        setSearchActive(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const [searchComponentes, setSearchComponentes] = useState([]);
   const [searchActive, setSearchActive] = useState(false);
   const handleSearch = (e) => {
@@ -292,7 +307,7 @@ function Used() {
         </Table.Cell>
         <Table.Cell>
           <BadgeComponent>
-            {componente?.componentes?.componentes_categories?.name}
+            {(componente?.componentes?.componentes_categories?.name).toUpperCase()}
           </BadgeComponent>
         </Table.Cell>
         <Table.Cell>
@@ -405,7 +420,9 @@ function Used() {
                 variant="p"
                 className="text-body-4 font-normal text-metal-600"
               >
-                <div className="flex gap-4 flex-col mt-4">
+                <div className="flex gap-4 flex-col mt-4 relative">
+            
+                  
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="used_date">Fecha de uso</Label>
                     <input
@@ -416,7 +433,27 @@ function Used() {
                       onChange={handleChange}
                     />
                   </div>
+
                   <div>
+
+                  </div>
+                  <fieldset className="flex flex-col max-w-md space-y-1">
+                    <Label htmlFor="category">Hospital</Label>
+                    <select
+                      name="hospital"
+                      id="hospital"
+                      onChange={handleChange}
+                    >
+                      <option value="Categoria">Seleccionar Hospital</option>
+                      {selectHospitals.map((hospital) => (
+                        <option value={hospital.id} key={hospital.id}>
+                          {hospital.name}
+                        </option>
+                      ))}
+                    </select>
+                  </fieldset>
+                  <div className="max-w-md space-y-1 w-full">
+                    <Label htmlFor="componente">Componente</Label>
                     <Input
                       autoComplete="off"
                       placeholder="Buscar por medida o categoria..."
@@ -426,28 +463,41 @@ function Used() {
                       onFocus={() => activeSearch()}
                     />
                     {searchActive && (
-                      <div className="absolute bg-slate-100 shadow-sm z-10 rounded p-3 border-blue-100">
-                        <p>Buscar componente por medida o categoría...</p>
-                        {searchComponentes.map((componente) => (
-                          <div
-                            key={componente.id}
-                            className="p-2 border-b border-gray-200 cursor-pointer hover:bg-slate-200 rounded"
-                            onClick={() => selectComponent(componente)}
-                          >
-                            <div className="flex gap-2">
-                              <p>{componente.measures}</p>
-                              <p>{componente.componentes_categories.name}</p>
-                              <p>Lote: {componente.lote}</p>
-                              <p>
-                                Caducidad:{" "}
-                                {new Date(
-                                  componente.caducidad
-                                ).toLocaleDateString()}
-                              </p>
-                              <p>Stock: {componente.stock}</p>
-                            </div>
-                          </div>
-                        ))}
+                      <div
+                        ref={refTableComponentes}
+                        className="border rounded-lg absolute w-full"
+                      >
+                        <Table>
+                          <Table.Head>
+                            <Table.HeadCell>Medidas</Table.HeadCell>
+                            <Table.HeadCell>Categoría</Table.HeadCell>
+                            <Table.HeadCell>Lote</Table.HeadCell>
+                            <Table.HeadCell>Caducidad</Table.HeadCell>
+                            <Table.HeadCell>Stock</Table.HeadCell>
+                          </Table.Head>
+
+                          <Table.Body className="divide-gray-25 divide-y">
+                            {searchComponentes.map((componente) => (
+                              <Table.Row
+                                key={componente.id}
+                                className="bg-white hover:bg-slate-100 cursor-pointer"
+                                onClick={() => selectComponent(componente)}
+                              >
+                                <Table.Cell>{componente.measures}</Table.Cell>
+                                <Table.Cell>
+                                  {componente.componentes_categories.name}
+                                </Table.Cell>
+                                <Table.Cell>{componente.lote}</Table.Cell>
+                                <Table.Cell>
+                                  {new Date(
+                                    componente.caducidad
+                                  ).toLocaleDateString()}
+                                </Table.Cell>
+                                <Table.Cell>{componente.stock}</Table.Cell>
+                              </Table.Row>
+                            ))}
+                          </Table.Body>
+                        </Table>
                       </div>
                     )}
                   </div>
@@ -496,14 +546,6 @@ function Used() {
                       </NumberInput>
                     </fieldset>
                   )}
-                  <select name="hospital" id="hospital" onChange={handleChange}>
-                    <option value="Categoria">Seleccionar Hospital</option>
-                    {selectHospitals.map((hospital) => (
-                      <option value={hospital.id} key={hospital.id}>
-                        {hospital.name}
-                      </option>
-                    ))}
-                  </select>
                   <Input
                     autoComplete="off"
                     placeholder="Nombre del Paciente"

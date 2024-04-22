@@ -150,10 +150,10 @@ function Hospitals() {
   };
 
   const renderHospitals = () => {
-    return hospitals.map((hospital) => (
+    return hospitals.map((hospital, index) => (
       <Table.Row className="bg-white" key={hospital.id}>
         <Table.Cell>
-          <p>{hospital.id}</p>
+          <p>{index + 1}</p>
         </Table.Cell>
         <Table.Cell>
           <Badge color="primary">{hospital.name}</Badge>
@@ -332,7 +332,7 @@ function Hospitals() {
         </Table.Caption>
 
         <Table.Head>
-          <Table.HeadCell>ID</Table.HeadCell>
+          <Table.HeadCell>No.</Table.HeadCell>
           <Table.HeadCell>Nombre</Table.HeadCell>
           <Table.HeadCell>Fecha Registro</Table.HeadCell>
           <Table.HeadCell />
