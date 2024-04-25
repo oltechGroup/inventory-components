@@ -1,85 +1,21 @@
-import { Button, Modal, Input, Avatar, Label, Slider } from "keep-react";
+import {
+  Button,
+  Modal,
+  Input,
+  Avatar,
+  Label,
+  Slider,
+  Spinner,
+} from "keep-react";
 import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "./context/AuthProvider";
 import { CloudArrowUp, Pencil } from "phosphor-react";
 import AvatarEditor from "react-avatar-editor";
-
-// Modal
-const CropperModal = ({ src, modalOpen, setModalOpen, setPreview }) => {
-  const [slideValue, setSlideValue] = useState(10);
-  const cropRef = useRef(null);
-
-  //handle save
-  const handleSave = async () => {
-    if (cropRef) {
-      const dataUrl = cropRef.current.getImage().toDataURL();
-      const result = await fetch(dataUrl);
-      const blob = await result.blob();
-      setPreview(URL.createObjectURL(blob));
-      setModalOpen(false);
-    }
-  };
-
-  return (
-    <Modal sx={modalStyle} open={modalOpen}>
-      <Box sx={boxStyle}>
-        <AvatarEditor
-          ref={cropRef}
-          image={src}
-          style={{ width: "100%", height: "100%" }}
-          border={50}
-          borderRadius={150}
-          color={[0, 0, 0, 0.72]}
-          scale={slideValue / 10}
-          rotate={0}
-        />
-
-        {/* MUI Slider */}
-        <Slider
-          min={10}
-          max={50}
-          sx={{
-            margin: "0 auto",
-            width: "80%",
-            color: "cyan",
-          }}
-          size="medium"
-          defaultValue={slideValue}
-          value={slideValue}
-          onChange={(e) => setSlideValue(e.target.value)}
-        />
-        <Box
-          sx={{
-            display: "flex",
-            padding: "10px",
-            border: "3px solid white",
-            background: "black",
-          }}
-        >
-          <Button
-            size="small"
-            sx={{ marginRight: "10px", color: "white", borderColor: "white" }}
-            variant="outlined"
-            onClick={(e) => setModalOpen(false)}
-          >
-            cancel
-          </Button>
-          <Button
-            sx={{ background: "#5596e6" }}
-            size="small"
-            variant="contained"
-            onClick={handleSave}
-          >
-            Save
-          </Button>
-        </Box>
-      </Box>
-    </Modal>
-  );
-};
+import { instance } from "./api/instance";
+import Swal from "sweetalert2";
 
 function UserProfile() {
-  const { user } = useAuth();
+  const { user, updateUserData } = useAuth();
 
   const [userToUpdate, setUserToUpdate] = useState({ ...user });
   const [changesMade, setChangesMade] = useState(false);
@@ -127,6 +63,7 @@ function UserProfile() {
   // Variables/Methods for update avatar
   const [imageInput, setImageInput] = useState(null);
   const [scaleImage, setScaleImage] = useState(1);
+  const [sendingUpdateAvatar, setSendingUpdateAvatar] = useState(false);
 
   const editor = useRef(null);
 
@@ -143,6 +80,57 @@ function UserProfile() {
   };
 
   // END Variables/Methods for update avatar
+
+  const sendAvatarUpdate = () => {
+    if (editor) {
+      setSendingUpdateAvatar(true);
+      // This returns a HTMLCanvasElement, it can be made into a data URL or a blob,
+      // drawn on another canvas, or added to the DOM.
+      const canvas = editor.current.getImage();
+
+      // If you want the image resized to the canvas size (also a HTMLCanvasElement)
+      const canvasScaled = editor.current.getImageScaledToCanvas();
+
+      // Get the image as a blob
+      canvas.toBlob(
+        (blob) => {
+          instance
+            .patch(
+              `/users/update-avatar/${user.id}`,
+              {
+                file: blob,
+              },
+              {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                },
+              }
+            )
+            .then((res) => {
+              Swal.fire({
+                title: "Actualizado",
+                text: "Se ha actualizado la foto de perfil correctamente",
+                icon: "success",
+              });
+              updateUserData(res.data);
+              setSendingUpdateAvatar(false);
+              closeModalImageCropper();
+            })
+            .catch((error) => {
+              setSendingUpdateAvatar(false);
+              console.error(error);
+              Swal.fire({
+                title: "Error",
+                text: "Ha ocurrido un error al actualizar la foto de perfil",
+                icon: "error",
+              });
+            });
+        },
+        "image/jpeg",
+        0.9
+      );
+    }
+  };
 
   const isSaveButtonDisabled = !changesMade;
 
@@ -378,28 +366,23 @@ function UserProfile() {
             >
               Cancelar
             </Button>
-            <Button
-              onClick={() => {
-                if (editor) {
-                  // If you want the image resized to the canvas size (also a HTMLCanvasElement)
-                  // const canvasScaled = editor.current.getImageScaledToCanvas();
-
-                  // This returns a HTMLCanvasElement, it can be made into a data URL or a blob,
-                  // drawn on another canvas, or added to the DOM.
-                  const canvas = editor.current.getImage();
-
-                  // TODO: Enviar la imagen al backend
-                  canvas.toBlob((blob) => {
-                    console.log(blob);
-                  });
-                }
-              }}
-              disabled={!imageInput}
-              size="sm"
-              color="primary"
-            >
-              Actualizar Foto
-            </Button>
+            {sendingUpdateAvatar ? (
+              <Button size="sm">
+                <span className="pr-2">
+                  <Spinner color="info" size="sm" />
+                </span>
+                Subiendo imagen...
+              </Button>
+            ) : (
+              <Button
+                onClick={sendAvatarUpdate}
+                disabled={!imageInput}
+                size="sm"
+                color="primary"
+              >
+                Actualizar Foto
+              </Button>
+            )}
           </Modal.Footer>
         </Modal.Body>
       </Modal>

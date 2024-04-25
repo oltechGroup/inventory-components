@@ -90,6 +90,12 @@ export default function AuthProvider({ children }) {
     setLoading(false);
   };
 
+  const updateUserData = (data) => {
+    setUser(data);
+    localStorage.removeItem("user");
+    localStorage.setItem("user", JSON.stringify(data));
+  }
+
   useEffect(() => getDataFromLocalStorage(), []);
 
   const contextValue = {
@@ -100,6 +106,7 @@ export default function AuthProvider({ children }) {
     isLogin,
     loading,
     updateUserLocalStorage,
+    updateUserData,
   };
 
   return (
