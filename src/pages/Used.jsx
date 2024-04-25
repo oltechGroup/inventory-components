@@ -107,7 +107,7 @@ function Used() {
     setSendingForm(true);
     try {
       await instance.put(`/componentes/used/${componentToUpdate.id}`, {
-        used_date: new Date(componentToUpdate.used_date),
+        used_date: componentToUpdate.used_date,
         quantity: parseInt(componentToUpdate.quantity),
         patient: componentToUpdate.patient,
         hospital_id: parseInt(componentToUpdate.hospital),
@@ -371,7 +371,7 @@ function Used() {
         hospital_id: parseInt(dataNewRegister.hospital),
         patient: dataNewRegister.patient,
         quantity: parseInt(dataNewRegister.quantity),
-        used_date: new Date(dataNewRegister.used_date),
+        used_date: dataNewRegister.used_date,
       });
       getComponentes();
 
@@ -421,8 +421,6 @@ function Used() {
                 className="text-body-4 font-normal text-metal-600"
               >
                 <div className="flex gap-4 flex-col mt-4 relative">
-            
-                  
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="used_date">Fecha de uso</Label>
                     <input
@@ -434,9 +432,7 @@ function Used() {
                     />
                   </div>
 
-                  <div>
-
-                  </div>
+                  <div></div>
                   <fieldset className="flex flex-col max-w-md space-y-1">
                     <Label htmlFor="category">Hospital</Label>
                     <select
