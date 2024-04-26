@@ -1,8 +1,8 @@
 import axios from "axios";
 
 export const instance = axios.create({
-//baseURL: "https://oltech-backend.onrender.com",
-baseURL: "http://localhost:3000",
+baseURL: "https://oltech-backend.onrender.com",
+// baseURL: "http://localhost:3000",
 });
 
 export const setTokenHeaderAPI = (token) => {
