@@ -14,16 +14,12 @@ import footer from "../../assets/images/footer.png";
 const styles = StyleSheet.create({
   page: {
     padding: 20,
-  },
-  container: {
-    height: "100%",
-    padding: 20,
-    borderStyle: "solid",
-    borderWidth: 3,
-    borderLeftColor: "#9263CD",
-    borderRightColor: "#A3C4EF",
-    borderTopColor: "#9263CD",
-    borderBottomColor: "#FC647D",
+    // borderStyle: "solid",
+    // borderWidth: 3,
+    // borderLeftColor: "#9263CD",
+    // borderRightColor: "#A3C4EF",
+    // borderTopColor: "#9263CD",
+    // borderBottomColor: "#FC647D",
     fontSize: 12,
     position: "relative",
   },
@@ -89,7 +85,6 @@ function RemissionPDF({ remission }) {
   return (
     <Document>
       <Page style={styles.page}>
-        <View style={styles.container}>
           <Image src={logo} style={styles.image} />
           <Text
             style={{
@@ -158,7 +153,6 @@ function RemissionPDF({ remission }) {
                   </View>
                 )
               )}
-              {/* Agrega más filas según sea necesario */}
             </View>
           </View>
 
@@ -205,12 +199,11 @@ function RemissionPDF({ remission }) {
             style={{
               width: "100%",
               position: "absolute",
-              bottom: 10,
-              left: 10,
-              right: 10,
+              bottom: 60,
+              left: 20,
+              right: 20,
             }}
           />
-        </View>
       </Page>
     </Document>
   );
