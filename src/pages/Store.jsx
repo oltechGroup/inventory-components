@@ -28,6 +28,8 @@ import Swal from "sweetalert2";
 import PaginationComponent from "../components/Pagination";
 import { SkeletonTable } from "../components/SkeletonTable";
 
+import { format } from "@formkit/tempo";
+
 function Store() {
   const [loading, setLoading] = useState(true);
 
@@ -82,7 +84,7 @@ function Store() {
         category: componentToUpdate.category,
         stock: parseInt(componentToUpdate.stock),
         lote: componentToUpdate.lote,
-        caducidad: new Date(componentToUpdate.caducidad),
+        caducidad: componentToUpdate.caducidad,
       });
       getComponents();
       Swal.fire({
@@ -176,7 +178,7 @@ function Store() {
         category: dataNewComponent.category,
         stock: parseInt(dataNewComponent.stock),
         lote: dataNewComponent.lote,
-        caducidad: new Date(dataNewComponent.caducidad),
+        caducidad: dataNewComponent.caducidad,
       });
       getComponents();
       Swal.fire({
@@ -217,26 +219,18 @@ function Store() {
           )}
         </Table.Cell>
         <Table.Cell>
-          <Badge>{componente.componentes_categories.name}</Badge>
+          <Badge size="sm">
+            {componente.componentes_categories.name.toUpperCase()}
+          </Badge>
         </Table.Cell>
         <Table.Cell>
-          <p>{new Date(
-            componente.registration_date.split("-")[0],
-            componente.registration_date.split("-")[1],
-            componente.registration_date.split("-")[2].split("T")[0]
-          ).toLocaleDateString()}</p>
+          <p>{new Date(componente.registration_date).toLocaleDateString()}</p>
         </Table.Cell>
         <Table.Cell>
           <Badge color="success">{componente.lote}</Badge>
         </Table.Cell>
         <Table.Cell>
-          <p>
-            {new Date(
-              componente.caducidad.split("-")[0],
-              componente.caducidad.split("-")[1],
-              componente.caducidad.split("-")[2].split("T")[0]
-            ).toLocaleDateString()}
-          </p>
+          <p>{new Date(componente.caducidad).toLocaleDateString()}</p>
         </Table.Cell>
         <Table.Cell>
           <Dropdown

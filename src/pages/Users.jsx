@@ -9,6 +9,7 @@ import {
   Input,
   Dropdown,
   Icon,
+
 } from "keep-react";
 import {
   ArrowDown,
@@ -20,58 +21,65 @@ import {
   MagnifyingGlass,
 } from "phosphor-react";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState} from "react";
 import { instance } from "../api/instance";
-
 import Swal from "sweetalert2";
 
-function Hospitals() {
-  const [dataNewHospital, setDataNewHospital] = useState({
+function Users() {
+
+  const [dataNewUser, setDataNewUser] = useState({
     name: "",
+    lastname: "",
+    email: "",
+    password:"",
+    role:"",
+    active: false,
   });
 
-  const [hospitals, setHospitals] = useState([]);
-  const [hospitalsInfo, setHospitalsInfo] = useState({});
+  const [user, setUsers] = useState([]);
+  const [usersInfo, setUsersInfo] = useState({});
+
+  const role = ['Admin', 'user', 'Instrumentista', 'Apoyo', "Inventario", "Almacen"];
 
   const [isOpen, setIsOpen] = useState(false);
 
-  // states for update hospital
   const [modalUpdateOpen, setModalUpdateOpen] = useState(false);
-  const [hospitalToUpdate, setHospitalToUpdate] = useState({});
-  const showModalUpdate = (hospital) => {
-    setHospitalToUpdate(hospital);
+  const [userToUpdate, setUserToUpdate] = useState({});
+  const showModalUpdate = (user) => {
+    setUserToUpdate(user);
     setModalUpdateOpen(true);
   };
+  
   const closeModalUpdate = () => {
-    setHospitalToUpdate({});
+    setUserToUpdate({});
     setModalUpdateOpen(false);
   };
+  
   const handleChangeUpdate = (e) => {
-    setHospitalToUpdate({
-      ...hospitalToUpdate,
+    setUserToUpdate({
+      ...userToUpdate,
       [e.target.name]: e.target.value,
     });
   };
   const sendFormUpdate = async () => {
     try {
       closeModalUpdate();
-      await instance.put(`/hospitals/${hospitalToUpdate.id}`, hospitalToUpdate);
-      getHospitals();
+      await instance.put(`/users/:id${userToUpdate.id}`, userToUpdate);
+      getUsers();
       Swal.fire({
         title: "Actualizado",
-        text: "El hospital ha sido actualizado exitosamente!",
+        text: "Usuarios actualizados exitosamente!",
         icon: "success",
       });
     } catch (error) {
       console.error(error);
       Swal.fire({
         title: "Error",
-        text: "Ha ocurrido un error al actualizar el hospital",
+        text: "Ha ocurrido un error",
         icon: "error",
       });
     }
   };
-  // End states for update hospital
 
   const openModal = () => {
     setIsOpen(true);
@@ -80,32 +88,33 @@ function Hospitals() {
     setIsOpen(false);
   };
 
-  const getHospitals = () => {
-    instance.get("/hospitals").then((response) => {
-      setHospitals(response.data.data);
-      setHospitalsInfo(response.data.info);
+  const getUsers = () => {
+    instance.get("/users").then((response) => {
+      setUsers(response.data.data);
+      setUsersInfo(response.data.info);
+      console.log(response.data.data)
     });
   };
 
-  const deleteHospital = (hospital) => {
+  const deleteUser = (user) => {
     Swal.fire({
-      title: `¿Eliminar ${hospital.name}?`,
-      text: `TODOS los registros e información relacionada con ${hospital.name} serán borrados también!`,
+      title: `¿Eliminar ${user.name}?`,
+      text: `Todos los registros de ${user.name} serán borrados!`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       cancelButtonText: "Cancelar",
-      confirmButtonText: "Si, Borrar!",
+      confirmButtonText: "Si, Eliminar!",
     }).then((result) => {
       if (result.isConfirmed) {
         instance
-          .delete(`/hospitals/${hospital.id}`)
+          .delete(`/users/:id${user.id}`)
           .then((response) => {
-            getHospitals();
+            getUsers();
             Swal.fire(
               "Eliminado!",
-              "El hospital se elimino correctamente.",
+              "El usuario se a elimino correctamente.",
               "success"
             );
           })
@@ -113,7 +122,7 @@ function Hospitals() {
             console.error(error);
             Swal.fire(
               "Error",
-              "Ha ocurrido un error al eliminar el hospital",
+              "Ha ocurrido un error al tratar de eliminar al usuario",
               "error"
             );
           });
@@ -121,9 +130,11 @@ function Hospitals() {
     });
   };
 
+  console.log(user)
+
   const handleChange = (e) => {
-    setDataNewHospital({
-      ...dataNewHospital,
+    setDataNewUser({
+      ...dataNewUser,
       [e.target.name]: e.target.value,
     });
   };
@@ -132,39 +143,70 @@ function Hospitals() {
     try {
       closeModal();
 
-      await instance.post("/hospitals", dataNewHospital);
-      getHospitals();
+      await instance.post('/auth/signup', dataNewUser);
+      getUsers();
       Swal.fire({
         title: "Creado",
-        text: "El hospital ha sido creado exitosamente!",
+        text: "Usuario creado exitosamente!",
         icon: "success",
-      });
+      }
+    );
     } catch (error) {
       console.error(error);
       Swal.fire({
         title: "Error",
-        text: "Ha ocurrido un error al crear el hospital",
+        text: "Ha ocurrido un error al crear el usuario",
         icon: "error",
       });
     }
   };
 
-  useEffect(() => getHospitals(), []);
+console.log(dataNewUser)
 
-  const renderHospitals = () => {
-    return hospitals.map((hospital, index) => (
-      <Table.Row className="bg-white" key={hospital.id}>
+  useEffect(() => getUsers(), []);
+
+  const renderBadge = (isActive) => {
+    if (isActive) {
+      return (
+        <Badge color="success" showIcon={true}>
+          Conectado
+        </Badge>
+      );
+    } else {
+      return (
+        <Badge color="error" showIcon={true}>
+          Desconectado
+        </Badge>
+      );
+    }
+  };
+
+  const renderUsers = () => {
+    return user.map((user) => (
+      <Table.Row className="bg-white" key={user.id}>
+       <Table.Cell>
+         <Avatar
+          img={user.avatar}
+          />
+       </Table.Cell>
         <Table.Cell>
-          <p>{index + 1}</p>
+          <p>{user.name}</p>
+          <p>{user.lastname}</p>
         </Table.Cell>
         <Table.Cell>
-          <Badge color="primary">{hospital.name}</Badge>
+          {renderBadge(user.active)}
+        </Table.Cell> 
+        <Table.Cell>
+          <p>{user.role}</p> 
         </Table.Cell>
         <Table.Cell>
-          <p>{new Date(hospital.registration_date).toDateString()}</p>
+          <p>{user.email}</p> 
         </Table.Cell>
         <Table.Cell>
-          <Dropdown
+        <p>{new Date(user.registration_date).toDateString()}</p>
+        </Table.Cell>
+        <Table.Cell>
+        <Dropdown
             action={
               <Button variant="outline" size="sm" shape="circle">
                 <DotsThreeOutline size={15} />
@@ -177,7 +219,7 @@ function Hospitals() {
                 <li className="rounded px-2 py-1 hover:bg-metal-100">
                   <button
                     className="flex w-full items-center justify-between text-body-4 font-normal text-metal-600"
-                    onClick={() => deleteHospital(hospital)}
+                    onClick={() => deleteUser(user)}
                   >
                     <span>Borrar</span>
                     <span>
@@ -188,7 +230,7 @@ function Hospitals() {
                 <li className="rounded px-2 py-1 hover:bg-metal-100">
                   <button
                     className="flex w-full items-center justify-between text-body-4 font-normal text-metal-600"
-                    onClick={() => showModalUpdate(hospital)}
+                    onClick={() => showModalUpdate(user)}
                   >
                     <span>Editar</span>
                     <span>
@@ -203,8 +245,9 @@ function Hospitals() {
       </Table.Row>
     ));
   };
+  
 
-  useEffect(() => getHospitals(), []);
+  useEffect(() => getUsers(), []);
 
   return (
     <>
@@ -219,7 +262,7 @@ function Hospitals() {
                 variant="h3"
                 className="mb-2 text-body-1 font-medium text-metal-900"
               >
-                Agregar nuevo hospital
+                Agregar nuevo Usuario
               </Typography>
               <Typography
                 variant="p"
@@ -227,9 +270,39 @@ function Hospitals() {
               >
                 <div className="flex gap-4 flex-col mt-4">
                   <Input
-                    placeholder="Nombre del hospital"
+                    placeholder="Nombre del usuario"
                     name="name"
                     type="text"
+                    onChange={handleChange}
+                  />
+
+                  <Input
+                    placeholder="Apellidos del usuario"
+                    name="lastname"
+                    type="text"
+                    onChange={handleChange}
+                  />
+
+                  <select
+                    placeholder="Cargo"
+                    name="role"
+                    onChange={handleChange}                  
+                  >
+                    {role.map((role, index) => (
+                      <option key={index} value={role}>{role}</option>
+                    ))}
+                   </select>
+                  <Input
+                    placeholder="Correo Electronico"
+                    name="email"
+                    type="email"
+                    onChange={handleChange}
+                  />
+
+                  <Input
+                    placeholder="Contraseña"
+                    name="password"
+                    type="password"
                     onChange={handleChange}
                   />
                 </div>
@@ -263,7 +336,7 @@ function Hospitals() {
                 variant="h3"
                 className="mb-2 text-body-1 font-medium text-metal-900"
               >
-                Editar Hospital
+                Editar Perfil
               </Typography>
               <Typography
                 variant="p"
@@ -271,12 +344,47 @@ function Hospitals() {
               >
                 <div className="flex gap-4 flex-col mt-4">
                   <Input
-                    placeholder="Nombre del hospital"
+                    placeholder="Nombre del Usuario"
                     name="name"
                     type="text"
-                    value={hospitalToUpdate.name}
+                    value={userToUpdate.name}
                     onChange={handleChangeUpdate}
                   />
+
+                  <Input
+                    placeholder="Apellidos del usuario"
+                    name="lastname"
+                    type="text"
+                    value={userToUpdate.lastname}
+                    onChange={handleChangeUpdate}
+                  />
+
+                  <select
+                    placeholder="Cargo"
+                    onChange={handleChangeUpdate}                  
+                  >
+                    {role.map((role, index) => (
+                      <option key={index} 
+                      value={role}>{role}</option>
+                    ))}
+                   </select>
+
+                  <Input
+                    placeholder="Correo Electronico"
+                    name="email"
+                    type="email"
+                    value={userToUpdate.email}
+                    onChange={handleChangeUpdate}
+                  />
+
+                  <Input
+                    placeholder="Contraseña"
+                    name="password"
+                    type="password"
+                    value={userToUpdate.password}
+                    onChange={handleChangeUpdate}
+                  />
+
                 </div>
               </Typography>
             </Typography>
@@ -301,16 +409,16 @@ function Hospitals() {
           </Modal.Footer>
         </Modal.Body>
       </Modal>
-      <h1>Hospitales</h1>
+      <h1>Usuarios</h1>
       <Table showCheckbox={true}>
         <Table.Caption>
           <div className="my-5 flex items-center px-6">
             <div className="flex items-center gap-5">
               <p className="text-body-1 font-semibold text-metal-600">
-                Hospitales Registrados
+                Usuarios Registrados
               </p>
               <Badge size="sm" color="secondary">
-                {hospitalsInfo.totalCount} Hospitales
+                {usersInfo.totalCount} Usuarios
               </Badge>
             </div>
             <div className="flex ml-5 items-center gap-5">
@@ -318,11 +426,11 @@ function Hospitals() {
                 <span className="pr-2">
                   <Cube size={24} />
                 </span>
-                Nuevo Hospital
+                Nuevo Usuario
               </Button>
               <fieldset className="relative w-64">
                 <Input
-                  placeholder="Buscar por categoría o medidas"
+                  placeholder="Buscar Usuario"
                   className="ps-11"
                 />
                 <Icon>
@@ -334,17 +442,21 @@ function Hospitals() {
         </Table.Caption>
 
         <Table.Head>
-          <Table.HeadCell>No.</Table.HeadCell>
-          <Table.HeadCell>Nombre</Table.HeadCell>
+          <Table.HeadCell>Avatar</Table.HeadCell>
+          <Table.HeadCell>Nombre/Apellido</Table.HeadCell>
+          <Table.HeadCell>Conexion</Table.HeadCell>
+          <Table.HeadCell>Cargo</Table.HeadCell>
+          <Table.HeadCell>Correo Electronico</Table.HeadCell>
           <Table.HeadCell>Fecha Registro</Table.HeadCell>
           <Table.HeadCell />
         </Table.Head>
         <Table.Body className="divide-gray-25 divide-y">
-          {renderHospitals()}
+          {renderUsers()}
         </Table.Body>
       </Table>
     </>
   );
 }
 
-export default Hospitals;
+
+export default Users

@@ -182,6 +182,7 @@ function Inventary() {
                   name="search"
                   onChange={handleSearch}
                 />
+                
                 <Icon>
                   <MagnifyingGlass size={18} color="#AFBACA" />
                 </Icon>
