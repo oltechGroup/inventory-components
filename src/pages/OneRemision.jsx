@@ -377,7 +377,7 @@ function OneRemision() {
       </Table>
 
       <Modal isOpen={isOpen} onClose={closeModal}>
-        <Modal.Body className="space-y-3 w-max flex flex-col">
+        <Modal.Body className="space-y-3 w-max flex flex-col max-h-screen overflow-y-scroll">
           <Modal.Icon>
             <CloudArrowUp size={28} color="#1B4DFF" />
           </Modal.Icon>
