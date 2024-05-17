@@ -13,7 +13,7 @@ function CardRemision({ id, name, codigo, date, count, user, status }) {
     >
       <Avatar className="absolute top-2 right-2" img={user?.avatar} />
       <div>
-        <p className="text-body-1 font-semibold text-metal-600 flex flex-col">
+        <p className="text-body-1 font-semibold text-metal-600 flex flex-col w-3/4">
           {name}
           <span className="text-body-5 text-metal-500">Folio: {codigo}</span>
         </p>

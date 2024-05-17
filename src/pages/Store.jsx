@@ -9,6 +9,7 @@ import {
   Icon,
   Label,
   NumberInput,
+  Breadcrumb,
 } from "keep-react";
 import {
   Cube,
@@ -29,6 +30,10 @@ import PaginationComponent from "../components/Pagination";
 import { SkeletonTable } from "../components/SkeletonTable";
 
 import { format } from "@formkit/tempo";
+import CardComponente from "../components/store/CardCategory";
+import { Route, Routes } from "react-router-dom";
+import Categories from "../components/store/Categories";
+import ComponentesSubcategory from "../components/store/ComponentesSubcategory";
 
 function Store() {
   const [loading, setLoading] = useState(true);
@@ -120,7 +125,7 @@ function Store() {
   const getComponents = () => {
     setLoading(true);
     instance
-      .get("/componentes", { params: paramsAPI })
+      .get("/componentes/grouped", { params: paramsAPI })
       .then((response) => {
         setComponentes(response.data.data);
         setComponentesInfo(response.data.info);
@@ -272,6 +277,14 @@ function Store() {
       </Table.Row>
     ));
   };
+
+  const renderComponentesGroup = () => {
+    return componentes.map((componente) => {
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-2 mt-8">hola</div>;
+    });
+  };
+
+  console.log(componentes);
 
   useEffect(() => getCategories(), []);
 
@@ -506,80 +519,40 @@ function Store() {
         </Modal.Body>
       </Modal>
       <h1>Almacén</h1>
-      <Table showCheckbox={true}>
-        <Table.Caption>
-          <div className="my-5 flex items-center px-6">
-            <div className="flex items-center gap-5">
-              <p className="text-body-1 font-semibold text-metal-600">
-                Componentes Registrados
-              </p>
-              <Badge size="sm" color="secondary">
-                {componentesInfo.totalCount} Componentes
-              </Badge>
-            </div>
-            <div className="flex ml-5 items-center gap-5">
-              <Button variant="outline" size="sm" onClick={openModal}>
-                <span className="pr-2">
-                  <Cube size={24} />
-                </span>
-                Nuevo Componente
-              </Button>
-              <fieldset className="relative w-64">
-                <Input
-                  placeholder="Buscar por categoría o medidas"
-                  className="ps-11"
-                  name="search"
-                  onChange={handleSearch}
-                />
-                <Icon>
-                  <MagnifyingGlass size={18} color="#AFBACA" />
-                </Icon>
-              </fieldset>
-            </div>
-          </div>
-          <div className="my-5 flex items-center px-6 gap-5">
-            <select name="order" id="order">
-              <option value="">Ordenar por creación</option>
-              <option value="">Ascendente</option>
-              <option value="">Descendente</option>
-            </select>
+      <div className="my-4 flex items-center">
+        <div className="flex items-center gap-2">
+          <p className="text-body-1 font-semibold text-metal-600">
+            Componentes
+          </p>
+          <Badge size="sm" color="secondary">
+            16 Categorias
+          </Badge>
+        </div>
+        <div className="flex ml-5 items-center gap-5">
+          <Button variant="outline" size="sm">
+            <span className="pr-2">
+              <Cube size={24} />
+            </span>
+            Registrar componentes
+          </Button>
+          <fieldset className="relative w-64">
+            <Input
+              placeholder="Buscar categoría, medidas, paciente, hospital..."
+              className="ps-11"
+              name="search"
+            />
+            <Icon>
+              <MagnifyingGlass size={18} color="#AFBACA" />
+            </Icon>
+          </fieldset>
+        </div>
+      </div>
 
-            <select name="category" id="category">
-              <option value="0">Ordenar por categoría</option>
+      <Routes>
+        <Route path="/" element={<Categories componentes={componentes} />} />
+        <Route path="/:category/*" element={<ComponentesSubcategory />} />
+      </Routes>
 
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </Table.Caption>
-
-        {loading ? (
-          <SkeletonTable />
-        ) : (
-          <>
-            <Table.Head>
-              <Table.HeadCell>
-                <p className="text-body-5 font-medium text-metal-400">
-                  Medidas
-                </p>
-              </Table.HeadCell>
-              <Table.HeadCell>En Stock</Table.HeadCell>
-              <Table.HeadCell>Categoría</Table.HeadCell>
-              <Table.HeadCell>Fecha Registro</Table.HeadCell>
-              <Table.HeadCell>Lote</Table.HeadCell>
-              <Table.HeadCell>Caducidad</Table.HeadCell>
-
-              <Table.HeadCell />
-            </Table.Head>
-            <Table.Body className="divide-gray-25 divide-y">
-              {renderComponentes()}
-            </Table.Body>
-          </>
-        )}
-      </Table>
       <PaginationComponent
         currentPage={paramsAPI.page}
         onChange={handlePageChange}
