@@ -11,6 +11,7 @@ function Categories({ componentes }) {
       <div className="grid grid-cols-3 gap-4">
         {componentes.map((componente) => (
           <CardCategory
+            key={componente.id}
             title={componente.category}
             count={componente.count}
             lotes={componente.lotes}

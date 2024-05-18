@@ -36,8 +36,10 @@ function ComponentesSubcategory() {
             <div className="grid grid-cols-3 gap-4">
               {componentes.map((componente) => (
                 <CardSubcategory
+                  key={componente.id}
                   title={componente.subcategory}
                   count={componente.stock}
+                  countRemission={componente.remision}
                 />
               ))}
             </div>
