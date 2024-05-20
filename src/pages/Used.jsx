@@ -91,7 +91,6 @@ function Used() {
     setModalUpdateOpen(false);
   };
   const handleChangeUpdate = (e) => {
-    console.log(e.target.name);
     setComponentToUpdate({
       ...componentToUpdate,
       [e.target.name]: e.target.value,

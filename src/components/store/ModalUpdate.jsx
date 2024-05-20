@@ -1,50 +1,58 @@
-function ModalUpdate() {
-  // states for update component
-  const [modalUpdateOpen, setModalUpdateOpen] = useState(false);
-  const [componentToUpdate, setComponentToUpdate] = useState({});
-  const showModalUpdate = (component) => {
-    setComponentToUpdate({ ...component, category: component.category_id });
-    setModalUpdateOpen(true);
+import {
+  Button,
+  Modal,
+  Typography,
+  Input,
+  Label,
+  NumberInput,
+} from "keep-react";
+import { CloudArrowUp, Minus, Plus } from "phosphor-react";
+
+import { useEffect, useState } from "react";
+
+import { instance } from "../../api/instance";
+
+function ModalUpdate({ isOpen, componentToUpdate, closeModal }) {
+  const [categories, setCategories] = useState([]);
+  const [componentUpdateState, setComponentUpdateState] = useState({});
+
+  const getCategories = () => {
+    instance.get("/componentes/categories").then((response) => {
+      setCategories(response.data);
+    });
   };
-  const closeModalUpdate = () => {
-    setComponentToUpdate({});
-    setModalUpdateOpen(false);
-  };
+
   const handleChangeUpdate = (e) => {
-    setComponentToUpdate({
+    setComponentUpdateState({
       ...componentToUpdate,
       [e.target.name]: e.target.value,
     });
   };
   const sendFormUpdate = async () => {
-    try {
-      closeModalUpdate();
-      await instance.put(`/componentes/${componentToUpdate.id}`, {
-        measures: componentToUpdate.measures,
-        category: componentToUpdate.category,
-        stock: parseInt(componentToUpdate.stock),
-        lote: componentToUpdate.lote,
-        caducidad: componentToUpdate.caducidad,
-      });
-      getComponents();
-      Swal.fire({
-        title: "Actualizado",
-        text: "El componente ha sido actualizado exitosamente!",
-        icon: "success",
-      });
-    } catch (error) {
-      console.error(error);
-      Swal.fire({
-        title: "Error",
-        text: "Ha ocurrido un error al actualizar el componente",
-        icon: "error",
-      });
-    }
+    closeModalUpdate();
+    await updateComponent({
+      measures: componentUpdateState.measures,
+      category: componentUpdateState.category,
+      stock: parseInt(componentUpdateState.stock),
+      lote: componentUpdateState.lote,
+      caducidad: componentUpdateState.caducidad,
+    });
   };
   // End states for update component
 
+  useEffect(() => {
+    getCategories();
+    setComponentUpdateState({
+      measures: componentToUpdate.measures,
+      category: componentToUpdate.category_id,
+      stock: componentToUpdate.stock,
+      lote: componentToUpdate.lote,
+      caducidad: componentToUpdate.caducidad,
+    });
+  }, [componentToUpdate]);
+
   return (
-    <Modal isOpen={modalUpdateOpen} onClose={closeModalUpdate}>
+    <Modal isOpen={isOpen} onClose={closeModal}>
       <Modal.Body className="space-y-3">
         <Modal.Icon>
           <CloudArrowUp size={28} color="#1B4DFF" />
@@ -84,7 +92,7 @@ function ModalUpdate() {
                       id="measures"
                       name="measures"
                       type="text"
-                      value={componentToUpdate.measures}
+                      value={componentUpdateState.measures}
                       onChange={handleChangeUpdate}
                     />
                   </fieldset>
@@ -95,7 +103,7 @@ function ModalUpdate() {
                       id="lote"
                       name="lote"
                       type="text"
-                      value={componentToUpdate.lote}
+                      value={componentUpdateState.lote}
                       onChange={handleChangeUpdate}
                     />
                   </fieldset>
@@ -106,7 +114,7 @@ function ModalUpdate() {
                   <input
                     type="date"
                     name="caducidad"
-                    // value={formatDateInput(componentToUpdate.caducidad)}
+                    // value={formatDateInput(componentUpdateState.caducidad)}
                     onChange={handleChangeUpdate}
                   />
                 </div>
@@ -116,9 +124,9 @@ function ModalUpdate() {
                   <NumberInput>
                     <NumberInput.Button
                       onClick={() =>
-                        setComponentToUpdate({
-                          ...componentToUpdate,
-                          stock: componentToUpdate.stock - 1,
+                        setComponentUpdateState({
+                          ...componentUpdateState,
+                          stock: componentUpdateState.stock - 1,
                         })
                       }
                     >
@@ -128,14 +136,14 @@ function ModalUpdate() {
                       defaultValue={0}
                       name="stock"
                       type="number"
-                      value={componentToUpdate.stock}
+                      value={componentUpdateState.stock}
                       onChange={handleChangeUpdate}
                     />
                     <NumberInput.Button
                       onClick={() =>
-                        setComponentToUpdate({
-                          ...componentToUpdate,
-                          stock: componentToUpdate.stock + 1,
+                        setComponentUpdateState({
+                          ...componentUpdateState,
+                          stock: componentUpdateState.stock + 1,
                         })
                       }
                     >
@@ -149,7 +157,7 @@ function ModalUpdate() {
         </Modal.Content>
         <Modal.Footer className="flex flex-row justify-end">
           <Button
-            onClick={closeModalUpdate}
+            onClick={closeModal}
             size="sm"
             variant="outline"
             color="secondary"
@@ -169,3 +177,5 @@ function ModalUpdate() {
     </Modal>
   );
 }
+
+export default ModalUpdate;

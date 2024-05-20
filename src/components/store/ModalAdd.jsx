@@ -15,7 +15,7 @@ import Swal from "sweetalert2";
 import { instance } from "../../api/instance";
 import { useNavigate } from "react-router-dom";
 
-function ModalAdd({ active, disactive }) {
+function ModalAdd({ active, disactiveModal }) {
   const nav = useNavigate();
   const [sending, setSending] = useState(false);
 
@@ -30,41 +30,6 @@ function ModalAdd({ active, disactive }) {
 
   const [categories, setCategories] = useState([]);
 
-  const deleteComponent = (componente) => {
-    Swal.fire({
-      title: `¿Eliminar ${componente.measures} ${componente.componentes_categories.name}?`,
-      text: "Toda la información relacionada con el componente será eliminada!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      cancelButtonText: "Cancelar",
-      confirmButtonText: "Si, Borrar!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        instance
-          .delete(`/componentes/${componente.id}`)
-          .then((response) => {
-            getComponents();
-            Swal.fire(
-              "Eliminado!",
-              "El componente se elimino correctamente.",
-              "success"
-            );
-          })
-          .catch((error) => {
-            console.error(error);
-            getComponents();
-            Swal.fire({
-              title: "Error",
-              text: "Ha ocurrido un error al eliminar el componente",
-              icon: "error",
-            });
-          });
-      }
-    });
-  };
-
   const handleChange = (e) => {
     setDataNewComponent({
       ...dataNewComponent,
@@ -78,9 +43,10 @@ function ModalAdd({ active, disactive }) {
     });
   };
 
-  console.log(dataNewComponent);
-
   const sendForm = async () => {
+    const nameCategory = categories.filter(
+      (category) => category.id === dataNewComponent.category
+    )[0].name;
     try {
       setSending(true);
       await instance.post("/componentes/add", {
@@ -90,20 +56,17 @@ function ModalAdd({ active, disactive }) {
         lote: dataNewComponent.lote,
         caducidad: dataNewComponent.caducidad,
       });
-      disactive();
+
+      disactiveModal();
       setSending(false);
+
       Swal.fire({
         title: "Creado",
         text: "El componente ha sido creado exitosamente!",
         icon: "success",
       });
-      nav(
-        `/store/${
-          categories.filter(
-            (category) => category.id === dataNewComponent.category
-          )[0].name
-        }/${dataNewComponent.category}`
-      );
+
+      nav(`/store/${nameCategory.split(" ")[0]}/${nameCategory}`);
     } catch (error) {
       setSending(false);
       console.error(error);
@@ -120,7 +83,7 @@ function ModalAdd({ active, disactive }) {
   }, []);
 
   return (
-    <Modal isOpen={active} onClose={disactive}>
+    <Modal isOpen={active} onClose={disactiveModal}>
       <Modal.Body className="space-y-3">
         <Modal.Icon>
           <CloudArrowUp size={28} color="#1B4DFF" />
@@ -202,7 +165,7 @@ function ModalAdd({ active, disactive }) {
         </Modal.Content>
         <Modal.Footer className="flex flex-row justify-end">
           <Button
-            onClick={disactive}
+            onClick={disactiveModal}
             size="sm"
             variant="outline"
             color="secondary"

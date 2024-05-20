@@ -1,19 +1,19 @@
 import { Badge, Button, Input, Icon } from "keep-react";
-import { Cube, MagnifyingGlass } from "phosphor-react";
+import { Cards, Cube, ListBullets, MagnifyingGlass } from "phosphor-react";
 
-import { useEffect, useState } from "react";
-import { instance } from "../api/instance";
-
-import { Route, Routes } from "react-router-dom";
-import Categories from "../components/store/Categories";
-import ComponentesSubcategory from "../components/store/ComponentesSubcategory";
+import { useState } from "react";
 import SearchComponents from "../components/store/SearchComponents";
 import ModalAdd from "../components/store/ModalAdd";
+import ViewComponentsCategory from "../components/store/ViewComponentsCategory";
+import ViewComponentsAll from "../components/store/ViewComponentsAll";
+import StoreProvider from "../context/StoreProvider";
 
 function Store() {
-  const [loading, setLoading] = useState(true);
-
-  const [componentes, setComponentes] = useState([]);
+  const modeViews = {
+    CATEGORIES: "categories",
+    LIST: "list",
+  };
+  const [modeViewComponents, setModeViewComponents] = useState("categories");
 
   // Variables for search components
   const [searchComponentes, setSearchComponentes] = useState({
@@ -29,24 +29,15 @@ function Store() {
   };
   // End Variables for search components
 
-  // Variables for Modal Add
   const [modalAddActive, setModalAddActive] = useState(false);
-  // End Variables for Modal Add
 
-  const getComponents = () => {
-    setLoading(true);
-    instance
-      .get("/componentes/grouped")
-      .then((response) => {
-        setComponentes(response.data.data);
-      })
-      .finally(() => setLoading(false));
+  const renderComponentes = () => {
+    if (modeViewComponents === modeViews.CATEGORIES) {
+      return <ViewComponentsCategory />;
+    } else {
+      return <ViewComponentsAll />;
+    }
   };
-
-  useEffect(() => {
-    getComponents();
-    window.scrollTo(0, 0);
-  }, []);
 
   return (
     <>
@@ -94,20 +85,49 @@ function Store() {
         </div>
       </div>
 
-      {searchComponentes.active ? (
-        <SearchComponents
-          search={searchComponentes.search}
-          disactive={closeSearchComponents}
-        />
-      ) : (
-        <Routes>
-          <Route path="/" element={<Categories componentes={componentes} />} />
-          <Route path="/:category/*" element={<ComponentesSubcategory />} />
-        </Routes>
-      )}
+      <div>
+        <div className="flex gap-2 items-center pb-4">
+          <Button
+            variant={
+              modeViewComponents === modeViews.CATEGORIES ? "" : "outline"
+            }
+            size="xs"
+            onClick={() => setModeViewComponents(modeViews.CATEGORIES)}
+            active={modeViewComponents === modeViews.CATEGORIES}
+          >
+            <span className="pr-2">
+              <Cards size={24} />
+            </span>
+            Categorías
+          </Button>
+          <Button
+            variant={modeViewComponents === modeViews.LIST ? "" : "outline"}
+            size="xs"
+            onClick={() => setModeViewComponents(modeViews.LIST)}
+            active={modeViewComponents === modeViews.LIST}
+          >
+            <span className="pr-2">
+              <ListBullets size={24} />
+            </span>
+            Lista
+          </Button>
+        </div>
+      </div>
+
+      <StoreProvider>
+        {searchComponentes.active ? (
+          <SearchComponents
+            search={searchComponentes.search}
+            disactive={closeSearchComponents}
+          />
+        ) : (
+          renderComponentes()
+        )}
+      </StoreProvider>
+
       <ModalAdd
         active={modalAddActive}
-        disactive={() => setModalAddActive(false)}
+        disactiveModal={() => setModalAddActive(false)}
       />
     </>
   );

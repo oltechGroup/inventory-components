@@ -29,7 +29,6 @@ function AddRemision() {
   const [componenteToUpdate, setComponenteToUpdate] = useState({});
   const openModal = (componente) => {
     setIsOpen(true);
-    console.log(componente);
     setComponenteToUpdate(componente);
   };
   const closeModal = () => {
