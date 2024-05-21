@@ -11,9 +11,11 @@ import { CloudArrowUp, Minus, Plus } from "phosphor-react";
 import { useEffect, useState } from "react";
 
 import { instance } from "../../api/instance";
+import { useStore } from "../../context/StoreProvider";
 
 function ModalUpdate({ isOpen, componentToUpdate, closeModal }) {
   const [categories, setCategories] = useState([]);
+  const { updateComponent } = useStore();
   const [componentUpdateState, setComponentUpdateState] = useState({});
 
   const getCategories = () => {
@@ -29,11 +31,12 @@ function ModalUpdate({ isOpen, componentToUpdate, closeModal }) {
     });
   };
   const sendFormUpdate = async () => {
-    closeModalUpdate();
+    closeModal();
     await updateComponent({
+      id: componentUpdateState.id,
       measures: componentUpdateState.measures,
-      category: componentUpdateState.category,
-      stock: parseInt(componentUpdateState.stock),
+      category_id: componentUpdateState.category,
+      stock: componentUpdateState.stock,
       lote: componentUpdateState.lote,
       caducidad: componentUpdateState.caducidad,
     });
@@ -43,6 +46,7 @@ function ModalUpdate({ isOpen, componentToUpdate, closeModal }) {
   useEffect(() => {
     getCategories();
     setComponentUpdateState({
+      id: componentToUpdate.id,
       measures: componentToUpdate.measures,
       category: componentToUpdate.category_id,
       stock: componentToUpdate.stock,

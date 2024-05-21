@@ -44,12 +44,10 @@ function ListComponentes() {
   });
 
   const showModalUpdate = (component) => {
-    console.log(component);
     setComponentToUpdate({ ...component, category: component.category });
     setModalUpdateActive(true);
   };
 
-  console.log(componentToUpdate);
   const closeModalUpdate = () => {
     setModalUpdateActive(false);
   };

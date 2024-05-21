@@ -31,14 +31,14 @@ function ViewComponentsAll() {
   const [modalUpdateActive, setModalUpdateActive] = useState(false);
   const [componentToUpdate, setComponentToUpdate] = useState({
     measures: "",
-    category: "",
+    category_id: "",
     stock: 0,
     lote: "",
     caducidad: "",
   });
 
   const showModalUpdate = (component) => {
-    setComponentToUpdate({ ...component, category: component.category_id });
+    setComponentToUpdate({ ...component, category_id: component.componentes_categories.id });
     setModalUpdateActive(true);
   };
 
@@ -56,6 +56,7 @@ function ViewComponentsAll() {
       })
       .finally(() => setLoading(false));
   };
+
 
   const renderComponentes = () => {
     return componentes.map((componente) => (

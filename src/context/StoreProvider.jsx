@@ -23,7 +23,7 @@ export default function StoreProvider({ children }) {
 
       Swal.fire({
         title: "Actualizado",
-        text: "El componente ha sido actualizado exitosamente!",
+        text: "El componente se ha creado!",
         icon: "success",
       });
     } catch (error) {
@@ -35,9 +35,9 @@ export default function StoreProvider({ children }) {
     }
   };
 
-  const updateComponent = async (component) => {
+  const updateComponent = async (componentToUpdate) => {
     try {
-      const response = await instance.put(
+      await instance.put(
         `/componentes/${componentToUpdate.id}`,
         {
           measures: componentToUpdate.measures,
@@ -48,7 +48,11 @@ export default function StoreProvider({ children }) {
         }
       );
 
-      return response;
+      Swal.fire({
+        title: "Actualizado",
+        text: "El componente ha sido actualizado exitosamente!",
+        icon: "success",
+      });
     } catch (error) {
       Swal.fire({
         title: "Error",
@@ -73,7 +77,6 @@ export default function StoreProvider({ children }) {
         instance
           .delete(`/componentes/${componente.id}`)
           .then((response) => {
-            getComponents();
             Swal.fire(
               "Eliminado!",
               "El componente se elimino correctamente.",
@@ -82,7 +85,6 @@ export default function StoreProvider({ children }) {
           })
           .catch((error) => {
             console.error(error);
-            getComponents();
             Swal.fire({
               title: "Error",
               text: "Ha ocurrido un error al eliminar el componente",
