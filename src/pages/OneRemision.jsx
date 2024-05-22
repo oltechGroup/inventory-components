@@ -246,7 +246,7 @@ function OneRemision() {
       <h2 className="text-body-1 font-semibold text-metal-600 mb-2">
         Detalles de la remisión:
       </h2>
-      <div className="flex flex-row gap-4 my-3">
+      <div className="flex flex-row gap-4 my-3 flex-wrap">
         <div className="bg-white p-4 rounded-lg shadow-md flex flex-col items-end gap-2 relative">
           <div className="flex gap-2 text-metal-400">
             <Calendar size={32} />
@@ -288,6 +288,33 @@ function OneRemision() {
               Finalizada
             </Badge>
           )}
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-md flex flex-col items-end gap-2 relative">
+          <div className="flex gap-2 text-metal-400">
+            <Cube size={32} />
+            <p className="text-body-3">Hospital</p>
+          </div>
+          <p className="text-body-3 text-metal-800 font-medium">
+            {remission.hospitals.name}
+          </p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-md flex flex-col items-end gap-2 relative">
+          <div className="flex gap-2 text-metal-400">
+            <Cube size={32} />
+            <p className="text-body-3">Cliente</p>
+          </div>
+          <p className="text-body-3 text-metal-800 font-medium">
+            {remission.client}
+          </p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-md flex flex-col items-end gap-2 relative">
+          <div className="flex gap-2 text-metal-400">
+            <Cube size={32} />
+            <p className="text-body-3">Encargado</p>
+          </div>
+          <p className="text-body-3 text-metal-800 font-medium">
+            {remission.encargado}
+          </p>
         </div>
       </div>
       <h2 className="text-body-1 font-semibold text-metal-600 mb-2">

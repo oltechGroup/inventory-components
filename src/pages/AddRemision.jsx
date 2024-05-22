@@ -97,16 +97,8 @@ function AddRemision() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    return console.log({
-      name: dataNewRegister.name,
-      date_remission: dataNewRegister.date_remission,
-      componentes: dataNewRegister.componentes,
-      client: dataNewRegister.client,
-      hospital_id: parseInt(dataNewRegister.hospital_id),
-      encargado: dataNewRegister.encargado,
-    });
-    setSendingForm(true);
 
+    setSendingForm(true);
     
     try {
       const response = await instance.post("componentes/add/remission", {
