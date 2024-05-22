@@ -20,7 +20,7 @@ function Home() {
         <Route path={routes.home} element={<Dashboard />} />
         <Route path={routes.consumo} element={<Used />} />
         <Route path={routes.inventary} element={<Inventary />} />
-        <Route path={routes.store} element={<Store />} />
+        <Route path={routes.store + "/*"} element={<Store />} />
         <Route path={routes.create} element={<Create />} />
         <Route path={routes.hospitals} element={<Hospitals />} />
         <Route path={routes.remision()} element={<OneRemision />} />

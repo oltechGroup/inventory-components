@@ -42,7 +42,6 @@ function Inventary() {
       .then((response) => {
         setComponentesInventory(response.data.data);
         setComponentesInfo(response.data.info);
-        console.log(response.data);
       })
       .finally(() => setLoading(false));
   };

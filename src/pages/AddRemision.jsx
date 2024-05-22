@@ -29,7 +29,6 @@ function AddRemision() {
   const [componenteToUpdate, setComponenteToUpdate] = useState({});
   const openModal = (componente) => {
     setIsOpen(true);
-    console.log(componente);
     setComponenteToUpdate(componente);
   };
   const closeModal = () => {
@@ -60,7 +59,7 @@ function AddRemision() {
     date_remission: "",
     componentes: [],
     client: "",
-    hospital_id: "",
+    hospital_id: 14, // 14 is the value "No Aplica"
     encargado: "",
   });
   const handleChange = (e) => {
@@ -98,8 +97,17 @@ function AddRemision() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    return console.log({
+      name: dataNewRegister.name,
+      date_remission: dataNewRegister.date_remission,
+      componentes: dataNewRegister.componentes,
+      client: dataNewRegister.client,
+      hospital_id: parseInt(dataNewRegister.hospital_id),
+      encargado: dataNewRegister.encargado,
+    });
     setSendingForm(true);
 
+    
     try {
       const response = await instance.post("componentes/add/remission", {
         name: dataNewRegister.name,
@@ -251,7 +259,6 @@ function AddRemision() {
                   id="hospital_id"
                   onChange={handleChange}
                 >
-                  <option value="">no aplica</option>
                   {selectHospitals.map((hospital) => (
                     <option value={hospital.id} key={hospital.id}>
                       {hospital.name}

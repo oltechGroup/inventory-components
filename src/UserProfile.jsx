@@ -27,7 +27,6 @@ function UserProfile() {
     newPassword: "",
   });
   const openModalPassword = () => {
-    console.log("modal abierto");
     setIsOpenModalPassword(true);
   };
   const closeModalPassword = () => {
@@ -56,7 +55,6 @@ function UserProfile() {
   };
 
   const saveChanges = () => {
-    console.log("Datos editados:", userToUpdate);
     setCurrentUser(userToUpdate);
   };
 

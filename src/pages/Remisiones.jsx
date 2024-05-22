@@ -15,7 +15,6 @@ function Remisiones() {
   const getRemissions = () => {
     instance.get("componentes/remissions").then((response) => {
       setRemissions(response.data.data);
-      console.log(response.data.data);
       setLoading(false);
     });
   };

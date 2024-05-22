@@ -92,7 +92,6 @@ function Users() {
     instance.get("/users").then((response) => {
       setUsers(response.data.data);
       setUsersInfo(response.data.info);
-      console.log(response.data.data)
     });
   };
 
@@ -130,8 +129,6 @@ function Users() {
     });
   };
 
-  console.log(user)
-
   const handleChange = (e) => {
     setDataNewUser({
       ...dataNewUser,
@@ -160,8 +157,6 @@ function Users() {
       });
     }
   };
-
-console.log(dataNewUser)
 
   useEffect(() => getUsers(), []);
 

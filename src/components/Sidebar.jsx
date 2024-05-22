@@ -105,7 +105,7 @@ export const SidebarComponent = () => {
         <NavLink to={routes.inventary}>
           <Sidebar.Item>
             <Archive size={24} />
-            Inventario
+            Movimientos
           </Sidebar.Item>
         </NavLink>
 

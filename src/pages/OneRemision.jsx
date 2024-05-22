@@ -136,8 +136,6 @@ function OneRemision() {
     }
   }, [remission]);
 
-  console.log(componentsFinished, "componentsFinished");
-
   const handleQuantityDelivered = (id, value) => {
     setComponentsFinished(
       componentsFinished.map((component) =>
