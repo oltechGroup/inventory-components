@@ -23,6 +23,14 @@ import { instance } from "../api/instance";
 import Swal from "sweetalert2";
 import { routes } from "../utils/routes";
 
+export const checkStock = (value, stock) => {
+  if (value > stock) {
+    return stock;
+  } else {
+    return value;
+  }
+};
+
 function AddRemision() {
   // States for modal
   const [isOpen, setIsOpen] = useState(false);
@@ -101,7 +109,7 @@ function AddRemision() {
     setSendingForm(true);
     
     try {
-      const response = await instance.post("componentes/add/remission", {
+      await instance.post("componentes/add/remission", {
         name: dataNewRegister.name,
         date_remission: dataNewRegister.date_remission,
         componentes: dataNewRegister.componentes,
@@ -136,13 +144,6 @@ function AddRemision() {
     quantity: 0,
     nameInput: "",
   });
-  const checkStock = (value, stock) => {
-    if (value > stock) {
-      return stock;
-    } else {
-      return value;
-    }
-  };
   const handleSearch = (e) => {
     setComponenteSelected({
       ...componenteSelected,

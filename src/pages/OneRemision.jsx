@@ -19,6 +19,8 @@ import {
   Plus,
   Minus,
   CloudArrowUp,
+  Pencil,
+  Trash,
 } from "phosphor-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -30,6 +32,9 @@ import { routes } from "../utils/routes";
 import RemissionPDF from "../components/pdf/RemissionPDF";
 
 import { pdf } from "@react-pdf/renderer";
+import ModalUpdateDetails from "../components/remission/ModalUpdateDetails";
+import ModalUpdateComponent from "../components/remission/ModalUpdateComponent";
+import ModalAddComponent from "../components/remission/ModalAddComponent";
 
 function OneRemision() {
   const { id: idRemission } = useParams();
@@ -90,7 +95,39 @@ function OneRemision() {
           <Table.Cell>
             {new Date(component.componentes.caducidad).toLocaleDateString()}
           </Table.Cell>
-          <Table.Cell></Table.Cell>
+          <Table.Cell className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              shape="circle"
+              onClick={() =>
+                openModalUpdateComponent({
+                  idComponentRemission: component.id,
+                  quantity: component.quantity,
+                  ...component.componentes,
+                })
+              }
+            >
+              <Pencil size={15} />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              shape="circle"
+              onClick={() =>
+                deleteComponent({
+                  idComponentRemission: component.id,
+                  measures: component.componentes.measures,
+                  registration_date: component.componentes.registration_date,
+                  stock: component.componentes.stock,
+                  lote: component.componentes.lote,
+                  category: component.componentes.componentes_categories.name,
+                })
+              }
+            >
+              <Trash size={15} />
+            </Button>
+          </Table.Cell>
         </Table.Row>
       )
     );
@@ -214,6 +251,93 @@ function OneRemision() {
       });
   };
 
+  // States for modal Update Details
+  const [remissionDetailsUpdate, setRemissionDetailsUpdate] = useState();
+
+  useEffect(() => {
+    setRemissionDetailsUpdate({
+      name: remission?.name,
+      date_remission: remission?.date_remission,
+      codigo: remission?.codigo,
+      hospital_id: remission?.hospital_id,
+      client: remission?.client,
+      encargado: remission?.encargado,
+    });
+  }, [remission]);
+
+  const [isOpenUpdateDetails, setIsOpenUpdateDetails] = useState(false);
+
+  const openModalUpdateDetails = () => {
+    setIsOpenUpdateDetails(true);
+  };
+
+  const closeModalUpdateDetails = () => {
+    getRemision();
+    setIsOpenUpdateDetails(false);
+  };
+  // End States for modal Update Details
+
+  // States for modal Update Component
+  const [componentToUpdate, setComponentToUpdate] = useState({});
+  const [isOpenUpdateComponent, setIsOpenUpdateComponent] = useState(false);
+
+  const openModalUpdateComponent = (component) => {
+    setComponentToUpdate(component);
+    setIsOpenUpdateComponent(true);
+  };
+
+  const closeModalUpdateComponent = () => {
+    getRemision();
+    setIsOpenUpdateComponent(false);
+  };
+
+  // States for add component
+  const [isOpenAddComponent, setIsOpenAddComponent] = useState(false);
+
+  const openModalAddComponent = () => {
+    setIsOpenAddComponent(true);
+  };
+
+  const closeModalAddComponent = () => {
+    getRemision();
+    setIsOpenAddComponent(false);
+  };
+
+  const deleteComponent = (componente) => {
+    Swal.fire({
+      title: `¿Eliminar ${componente.measures} ${componente.category}?`,
+      text: "",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      cancelButtonText: "Cancelar",
+      confirmButtonText: "Si, Borrar!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        instance
+          .delete(
+            `/componentes/remove/component-remission/${componente.idComponentRemission}`
+          )
+          .then((response) => {
+            Swal.fire(
+              "Eliminado!",
+              "El componente se eliminó de la remisión.",
+              "success"
+            );
+          })
+          .catch((error) => {
+            console.error(error);
+            Swal.fire({
+              title: "Error",
+              text: "Ha ocurrido un error al eliminar el componente",
+              icon: "error",
+            });
+          });
+      }
+    });
+  };
+
   useEffect(() => scrollTo(0, 0), []);
   useEffect(() => getRemision(), [idRemission]);
 
@@ -221,6 +345,20 @@ function OneRemision() {
 
   return (
     <>
+      <ModalUpdateComponent
+        isOpen={isOpenUpdateComponent}
+        closeModal={closeModalUpdateComponent}
+        component={componentToUpdate}
+      />
+      <ModalUpdateDetails
+        isOpen={isOpenUpdateDetails}
+        closeModal={closeModalUpdateDetails}
+        remission={remissionDetailsUpdate}
+      />
+      <ModalAddComponent
+        isOpen={isOpenAddComponent}
+        closeModal={closeModalAddComponent}
+      />
       <div className="flex gap-4 items-center mb-4">
         <button
           className="rounded-full p-2 bg-slate-200"
@@ -243,9 +381,14 @@ function OneRemision() {
         </div>
       </div>
 
-      <h2 className="text-body-1 font-semibold text-metal-600 mb-2">
-        Detalles de la remisión:
-      </h2>
+      <div className="flex items-center gap-2">
+        <h2 className="text-body-1 font-semibold text-metal-600 mb-2">
+          Detalles de la remisión
+        </h2>
+        <Button variant="outline" size="xs" onClick={openModalUpdateDetails}>
+          <Pencil size={20} className="mr-1.5" /> Editar Detalles
+        </Button>
+      </div>
       <div className="flex flex-row gap-4 my-3 flex-wrap">
         <div className="bg-white p-4 rounded-lg shadow-md flex flex-col items-end gap-2 relative">
           <div className="flex gap-2 text-metal-400">
@@ -365,7 +508,7 @@ function OneRemision() {
       </div>
       <Table showCheckbox={true}>
         <Table.Caption>
-          <div className="my-5 flex items-center px-6">
+          <div className="my-5 flex items-center px-6 gap-4">
             <div className="flex items-center gap-5">
               <p className="text-body-1 font-semibold text-metal-600">
                 Componentes en remisión
@@ -383,6 +526,13 @@ function OneRemision() {
                 </Icon>
               </fieldset>
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={openModalAddComponent}
+            >
+              <Cube size={20} className="mr-1.5" /> Agregar Componente
+            </Button>
           </div>
         </Table.Caption>
 
