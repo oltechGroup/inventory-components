@@ -3,6 +3,7 @@ import { Button, Input, Label, Modal } from "keep-react";
 import { useEffect, useState } from "react";
 import { formatDateForInput } from "../../utils/dateFunctions";
 import { instance } from "../../api/instance";
+import Swal from "sweetalert2";
 
 function ModalUpdateDetails({ isOpen, closeModal, remission }) {
   const [selectHospitals, setSelectHospitals] = useState([]);
@@ -19,6 +20,40 @@ function ModalUpdateDetails({ isOpen, closeModal, remission }) {
     instance.get("/hospitals/select").then((response) => {
       setSelectHospitals(response.data);
     });
+  };
+
+  const sendFormUpdate = () => {
+    // Obtenemos solo los campos que se modificaron
+    const dataToUpdate = Object.keys(remissionToUpdate).reduce((acc, key) => {
+      if (remissionToUpdate[key] !== remission[key]) {
+        acc[key] = remissionToUpdate[key];
+      }
+      return acc;
+    }, {});
+
+    instance
+      .put(
+        `componentes/update/details-remission/${remissionToUpdate.id}`,
+        dataToUpdate
+      )
+      .then((response) => {
+        Swal.fire({
+          title: "Actualizado",
+          text: "El componente ha sido actualizado exitosamente!",
+          icon: "success",
+        });
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: "error",
+          title: "Error al actualizar la remisión",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      })
+      .finally(() => {
+        closeModal();
+      });
   };
 
   useEffect(() => {
@@ -110,7 +145,7 @@ function ModalUpdateDetails({ isOpen, closeModal, remission }) {
           >
             Cancelar
           </Button>
-          <Button onClick={closeModal} size="sm" color="primary">
+          <Button onClick={sendFormUpdate} size="sm" color="primary">
             Actualizar remisión
           </Button>
         </Modal.Footer>

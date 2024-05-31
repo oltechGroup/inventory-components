@@ -35,7 +35,7 @@ export default function StoreProvider({ children }) {
     }
   };
 
-  const updateComponent = async (componentToUpdate) => {
+  const updateComponent = async (componentToUpdate, callback) => {
     try {
       await instance.put(
         `/componentes/${componentToUpdate.id}`,
@@ -53,6 +53,8 @@ export default function StoreProvider({ children }) {
         text: "El componente ha sido actualizado exitosamente!",
         icon: "success",
       });
+
+      callback();
     } catch (error) {
       Swal.fire({
         title: "Error",
@@ -62,7 +64,7 @@ export default function StoreProvider({ children }) {
     }
   };
 
-  const deleteComponent = (componente) => {
+  const deleteComponent = (componente, callback) => {
     Swal.fire({
       title: `¿Eliminar ${componente.measures} ${componente.category}?`,
       text: "Toda la información relacionada con el componente será eliminada!",
@@ -82,6 +84,7 @@ export default function StoreProvider({ children }) {
               "El componente se elimino correctamente.",
               "success"
             );
+            callback();
           })
           .catch((error) => {
             console.error(error);

@@ -256,6 +256,7 @@ function OneRemision() {
 
   useEffect(() => {
     setRemissionDetailsUpdate({
+      id: remission?.id,
       name: remission?.name,
       date_remission: remission?.date_remission,
       codigo: remission?.codigo,
@@ -299,7 +300,6 @@ function OneRemision() {
   };
 
   const closeModalAddComponent = () => {
-    getRemision();
     setIsOpenAddComponent(false);
   };
 
@@ -320,6 +320,7 @@ function OneRemision() {
             `/componentes/remove/component-remission/${componente.idComponentRemission}`
           )
           .then((response) => {
+            getRemision();
             Swal.fire(
               "Eliminado!",
               "El componente se eliminó de la remisión.",
@@ -358,6 +359,7 @@ function OneRemision() {
       <ModalAddComponent
         isOpen={isOpenAddComponent}
         closeModal={closeModalAddComponent}
+        idRemission={idRemission}
       />
       <div className="flex gap-4 items-center mb-4">
         <button

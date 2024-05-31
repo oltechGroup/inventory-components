@@ -57,15 +57,15 @@ function ModalAdd({ active, disactiveModal }) {
         caducidad: dataNewComponent.caducidad,
       });
 
-      disactiveModal();
       setSending(false);
-
+      
       Swal.fire({
         title: "Creado",
         text: "El componente ha sido creado exitosamente!",
         icon: "success",
       });
-
+      
+      disactiveModal();
       nav(`/store/${nameCategory.split(" ")[0]}/${nameCategory}`);
     } catch (error) {
       setSending(false);

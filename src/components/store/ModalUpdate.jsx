@@ -31,15 +31,17 @@ function ModalUpdate({ isOpen, componentToUpdate, closeModal }) {
     });
   };
   const sendFormUpdate = async () => {
-    closeModal();
-    await updateComponent({
-      id: componentUpdateState.id,
-      measures: componentUpdateState.measures,
-      category_id: componentUpdateState.category,
-      stock: componentUpdateState.stock,
-      lote: componentUpdateState.lote,
-      caducidad: componentUpdateState.caducidad,
-    });
+    updateComponent(
+      {
+        id: componentUpdateState.id,
+        measures: componentUpdateState.measures,
+        category_id: componentUpdateState.category,
+        stock: componentUpdateState.stock,
+        lote: componentUpdateState.lote,
+        caducidad: componentUpdateState.caducidad,
+      },
+      closeModal
+    );
   };
   // End states for update component
 
