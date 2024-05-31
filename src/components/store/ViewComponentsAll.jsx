@@ -38,12 +38,16 @@ function ViewComponentsAll() {
   });
 
   const showModalUpdate = (component) => {
-    setComponentToUpdate({ ...component, category_id: component.componentes_categories.id });
+    setComponentToUpdate({
+      ...component,
+      category_id: component.componentes_categories.id,
+    });
     setModalUpdateActive(true);
   };
 
   const closeModalUpdate = () => {
     setModalUpdateActive(false);
+    getComponents();
   };
 
   const getComponents = () => {
@@ -56,7 +60,6 @@ function ViewComponentsAll() {
       })
       .finally(() => setLoading(false));
   };
-
 
   const renderComponentes = () => {
     return componentes.map((componente) => (
@@ -108,13 +111,16 @@ function ViewComponentsAll() {
                 <li className="rounded px-2 py-1 hover:bg-metal-100">
                   <button
                     className="flex w-full items-center justify-between text-body-4 font-normal text-metal-600"
-                    onClick={() =>
-                      deleteComponent({
-                        id: componente.id,
-                        measures: componente.measures,
-                        category: componente.componentes_categories.name,
-                      })
-                    }
+                    onClick={() => {
+                      deleteComponent(
+                        {
+                          id: componente.id,
+                          measures: componente.measures,
+                          category: componente.componentes_categories.name,
+                        },
+                        getComponents
+                      );
+                    }}
                   >
                     <span>Borrar</span>
                     <span>

@@ -1,18 +1,8 @@
-import {
-  Breadcrumb,
-  Badge,
-  Button,
-  Table,
-  Dropdown,
-} from "keep-react";
+import { Breadcrumb, Badge, Button, Table, Dropdown } from "keep-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { formatNormalString } from "../../utils/formatStringForURL";
 import { capitalizeString } from "../../utils/capitalizeString";
-import {
-  DotsThreeOutline,
-  Pencil,
-  Trash,
-} from "phosphor-react";
+import { DotsThreeOutline, Pencil, Trash } from "phosphor-react";
 import { useEffect, useState } from "react";
 import { instance } from "../../api/instance";
 import { useStore } from "../../context/StoreProvider";
@@ -33,6 +23,17 @@ function ListComponentes() {
     order: "DESC",
   });
 
+  const getComponents = () => {
+    instance
+      .get(`/componentes/subcategory/${subcategoryFormatted}`, {
+        params: paramsAPI,
+      })
+      .then((response) => {
+        setComponentes(response.data.data);
+        setComponentesInfo(response.data.info);
+      });
+  };
+
   // States for update component
   const [modalUpdateActive, setModalUpdateActive] = useState(false);
   const [componentToUpdate, setComponentToUpdate] = useState({
@@ -49,21 +50,11 @@ function ListComponentes() {
   };
 
   const closeModalUpdate = () => {
+    getComponents();
     setModalUpdateActive(false);
   };
-  
-  const nav = useNavigate();
 
-  const getComponents = () => {
-    instance
-      .get(`/componentes/subcategory/${subcategoryFormatted}`, {
-        params: paramsAPI,
-      })
-      .then((response) => {
-        setComponentes(response.data.data);
-        setComponentesInfo(response.data.info);
-      });
-  };
+  const nav = useNavigate();
 
   const renderComponentes = () => {
     return componentes.map((componente) => (
@@ -113,11 +104,13 @@ function ListComponentes() {
                 <li className="rounded px-2 py-1 hover:bg-metal-100">
                   <button
                     className="flex w-full items-center justify-between text-body-4 font-normal text-metal-600"
-                    onClick={() => deleteComponent({
-                      id: componente.id,
-                      measures: componente.measures,
-                      category: componente.categoria,
-                    })}
+                    onClick={() => {
+                      deleteComponent({
+                        id: componente.id,
+                        measures: componente.measures,
+                        category: componente.categoria,
+                      }, getComponents);
+                    }}
                   >
                     <span>Borrar</span>
                     <span>

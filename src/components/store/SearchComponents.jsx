@@ -2,9 +2,34 @@ import { Badge, Button, Table, Dropdown } from "keep-react";
 import { DotsThreeOutline, Pencil, Trash, ArrowLeft } from "phosphor-react";
 import { instance } from "../../api/instance";
 import { useEffect, useState } from "react";
+import { useStore } from "../../context/StoreProvider";
+import ModalUpdate from "./ModalUpdate";
 
 function SearchComponents({ search, disactive }) {
   const [componentes, setComponentes] = useState([]);
+  const { deleteComponent } = useStore();
+
+  const [modalUpdateActive, setModalUpdateActive] = useState(false);
+  const [componentToUpdate, setComponentToUpdate] = useState({
+    measures: "",
+    category_id: "",
+    stock: 0,
+    lote: "",
+    caducidad: "",
+  });
+
+  const showModalUpdate = (component) => {
+    setComponentToUpdate({
+      ...component,
+      category_id: component.componentes_categories.id,
+    });
+    setModalUpdateActive(true);
+  };
+
+  const closeModalUpdate = () => {
+    setModalUpdateActive(false);
+    getComponents();
+  };
 
   const getComponents = () => {
     instance.get("/componentes", { params: { search } }).then((response) => {
@@ -62,7 +87,16 @@ function SearchComponents({ search, disactive }) {
                 <li className="rounded px-2 py-1 hover:bg-metal-100">
                   <button
                     className="flex w-full items-center justify-between text-body-4 font-normal text-metal-600"
-                    onClick={() => deleteComponent(componente)}
+                    onClick={() =>
+                      deleteComponent(
+                        {
+                          id: componente.id,
+                          measures: componente.measures,
+                          category: componente.componentes_categories.name,
+                        },
+                        getComponents
+                      )
+                    }
                   >
                     <span>Borrar</span>
                     <span>
@@ -120,6 +154,12 @@ function SearchComponents({ search, disactive }) {
           {renderComponentes()}
         </Table.Body>
       </Table>
+
+      <ModalUpdate
+        isOpen={modalUpdateActive}
+        closeModal={closeModalUpdate}
+        componentToUpdate={componentToUpdate}
+      />
     </>
   );
 }
