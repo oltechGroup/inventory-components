@@ -67,7 +67,7 @@ function AddRemision() {
     date_remission: "",
     componentes: [],
     client: "",
-    hospital_id: 14, // 14 is the value "No Aplica"
+    hospital_id: 1, // 1 is the value "No Aplica"
     encargado: "",
   });
   const handleChange = (e) => {

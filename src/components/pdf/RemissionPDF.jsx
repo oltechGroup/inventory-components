@@ -62,6 +62,7 @@ const styles = StyleSheet.create({
   sectionFirma: {
     width: "80%",
     marginHorizontal: "auto",
+    marginVertical: 32,
     flexDirection: "row",
     gap: 16,
   },

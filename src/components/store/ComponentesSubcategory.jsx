@@ -13,6 +13,7 @@ function ComponentesSubcategory() {
 
   const getComponentsSubcategoryByCategory = (category) => {
     instance.get(`/componentes/grouped/${category}`).then((response) => {
+      console.log(response);
       setComponentes(response.data.data);
     });
   };

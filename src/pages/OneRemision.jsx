@@ -227,6 +227,14 @@ function OneRemision() {
       components: componentsFinished,
     };
 
+    Swal.fire({
+      title: "Finalizando...",
+      text: "Estamos finalizando la remisión, por favor espera",
+      icon: "info",
+      showConfirmButton: false,
+      allowOutsideClick: false,
+    });
+
     instance
       .post(`/componentes/remission/finalize/${data.remission_id}`, {
         componentes: data.components,
@@ -237,9 +245,6 @@ function OneRemision() {
           text: "La remisión ha sido finalizada con éxito!",
           icon: "success",
         });
-        closeModal();
-        getRemision();
-        nav(routes.remisiones);
       })
       .catch((err) => {
         console.log(err);
@@ -248,6 +253,11 @@ function OneRemision() {
           text: "No se ha podido finalizar la remisión, algo salio mal!",
           icon: "error",
         });
+      })
+      .finally(() => {
+        closeModal();
+        getRemision();
+        nav(routes.remisiones);
       });
   };
 
@@ -337,6 +347,36 @@ function OneRemision() {
           });
       }
     });
+  };
+
+  const dropRemission = () => {
+    if (remission.status == "Finalizado") {
+      Swal.fire({
+        title: "Eliminando remisión...",
+        text: "Estamos eliminando la remisión, por favor espera",
+        icon: "info",
+        showConfirmButton: false,
+        allowOutsideClick: false,
+      });
+
+      instance
+        .delete(`/componentes/remission/drop/${idRemission}`)
+        .then(() => {
+          Swal.fire({
+            title: "Remisión eliminada",
+            text: "La remisión ha sido eliminada con éxito!",
+            icon: "success",
+          });
+          nav(routes.remisiones);
+        })
+        .catch(() => {
+          Swal.fire({
+            title: "Error",
+            text: "No se ha podido eliminar la remisión, algo salio mal!",
+            icon: "error",
+          });
+        });
+    }
   };
 
   useEffect(() => scrollTo(0, 0), []);
@@ -480,6 +520,14 @@ function OneRemision() {
           </span>
           Imprimir Hoja
         </Button>
+        {remission.status === "Finalizado" ? (
+          <Button size="sm" color="error" onClick={() => dropRemission()}>
+            <span className="pr-2">
+              <Trash size={24} />
+            </span>
+            Borrar Remisión
+          </Button>
+        ) : null}
         {remission.status === "En proceso" ? (
           <Button
             size="sm"
@@ -528,11 +576,7 @@ function OneRemision() {
                 </Icon>
               </fieldset>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={openModalAddComponent}
-            >
+            <Button variant="outline" size="sm" onClick={openModalAddComponent}>
               <Cube size={20} className="mr-1.5" /> Agregar Componente
             </Button>
           </div>

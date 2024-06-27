@@ -40,6 +40,7 @@ function ModalAdd({ active, disactiveModal }) {
   const getCategories = () => {
     instance.get("/componentes/categories").then((response) => {
       setCategories(response.data);
+      console.log(response.data);
     });
   };
 
