@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   tableCell: {
     margin: "auto",
     marginTop: 5,
-    fontSize: 10,
+    fontSize: 7.5,
   },
   // Firma
   sectionFirma: {
