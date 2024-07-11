@@ -19,7 +19,7 @@ function ViewComponentsAll() {
     perPage: 20,
     search: "",
     sort: "registration_date",
-    order: "DESC",
+    order: "desc",
   });
   const handlePageChange = (page) => {
     setParamsAPI({ ...paramsAPI, page });
@@ -154,6 +154,38 @@ function ViewComponentsAll() {
 
   return (
     <>
+      <div>
+        <select
+          name="sort"
+          id="sort"
+          onChange={(e) =>
+            setParamsAPI({
+              ...paramsAPI,
+              sort: e.target.value,
+            })
+          }
+        >
+          <option value="registration_date">Ordenar por</option>
+          <option value="registration_date">Fecha de registro</option>
+          <option value="measures">Medidas</option>
+        </select>
+
+        <select
+          style={{ marginLeft: "1rem" }}
+          name="order"
+          id="order"
+          onChange={(e) =>
+            setParamsAPI({
+              ...paramsAPI,
+              order: e.target.value,
+            })
+          }
+        >
+          <option value="desc">Desendente</option>
+          <option value="asc">Ascendente</option>
+        </select>
+      </div>
+
       <Table showCheckbox={true}>
         {loading ? (
           <SkeletonTable />

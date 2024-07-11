@@ -4,6 +4,7 @@ import { instance } from "../../api/instance";
 import { useEffect, useState } from "react";
 import CardSubcategory from "./CardSubcategory";
 import ListComponentes from "./ListComponentes";
+import { capitalizeString } from "../../utils/capitalizeString";
 
 function ComponentesSubcategory() {
   const { category } = useParams();
@@ -32,7 +33,9 @@ function ComponentesSubcategory() {
               <div onClick={() => nav("/store")}>
                 <Breadcrumb.Item>Componentes</Breadcrumb.Item>
               </div>
-              <Breadcrumb.Item activeType="base">{category}</Breadcrumb.Item>
+              <Breadcrumb.Item activeType="base">
+                {capitalizeString(category)}
+              </Breadcrumb.Item>
             </Breadcrumb>
             <div className="grid grid-cols-3 gap-4">
               {componentes.map((componente) => (

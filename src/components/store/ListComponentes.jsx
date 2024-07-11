@@ -7,8 +7,11 @@ import { useEffect, useState } from "react";
 import { instance } from "../../api/instance";
 import { useStore } from "../../context/StoreProvider";
 import ModalUpdate from "./ModalUpdate";
+import { SkeletonTable } from "../SkeletonTable";
 
 function ListComponentes() {
+  const [loading, setLoading] = useState(true);
+
   const { deleteComponent } = useStore();
   const { category, subcategory } = useParams();
   let subcategoryFormatted = formatNormalString(subcategory);
@@ -16,14 +19,12 @@ function ListComponentes() {
   const [componentes, setComponentes] = useState([]);
   const [componentesInfo, setComponentesInfo] = useState({});
   const [paramsAPI, setParamsAPI] = useState({
-    page: 1,
-    perPage: 20,
-    search: "",
     sort: "registration_date",
     order: "DESC",
   });
 
   const getComponents = () => {
+    setLoading(true);
     instance
       .get(`/componentes/subcategory/${subcategoryFormatted}`, {
         params: paramsAPI,
@@ -31,6 +32,9 @@ function ListComponentes() {
       .then((response) => {
         setComponentes(response.data.data);
         setComponentesInfo(response.data.info);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -105,11 +109,14 @@ function ListComponentes() {
                   <button
                     className="flex w-full items-center justify-between text-body-4 font-normal text-metal-600"
                     onClick={() => {
-                      deleteComponent({
-                        id: componente.id,
-                        measures: componente.measures,
-                        category: componente.categoria,
-                      }, getComponents);
+                      deleteComponent(
+                        {
+                          id: componente.id,
+                          measures: componente.measures,
+                          category: componente.categoria,
+                        },
+                        getComponents
+                      );
                     }}
                   >
                     <span>Borrar</span>
@@ -155,21 +162,61 @@ function ListComponentes() {
         </Breadcrumb.Item>
       </Breadcrumb>
 
-      <Table showCheckbox={true}>
-        <Table.Head>
-          <Table.HeadCell>
-            <p className="text-body-5 font-medium text-metal-400">Medidas</p>
-          </Table.HeadCell>
-          <Table.HeadCell>En Stock</Table.HeadCell>
-          <Table.HeadCell>Categoría</Table.HeadCell>
-          <Table.HeadCell>Fecha Registro</Table.HeadCell>
-          <Table.HeadCell>Lote</Table.HeadCell>
-          <Table.HeadCell>Caducidad</Table.HeadCell>
-          <Table.HeadCell />
-        </Table.Head>
-        <Table.Body className="divide-gray-25 divide-y">
-          {renderComponentes()}
-        </Table.Body>
+      <div>
+        <select
+          name="sort"
+          id="sort"
+          onChange={(e) =>
+            setParamsAPI({
+              ...paramsAPI,
+              sort: e.target.value,
+            })
+          }
+        >
+          <option value="registration_date">Ordenar por</option>
+          <option value="registration_date">Fecha de registro</option>
+          <option value="measures">Medidas</option>
+        </select>
+
+        <select
+          style={{ marginLeft: "1rem" }}
+          name="order"
+          id="order"
+          onChange={(e) =>
+            setParamsAPI({
+              ...paramsAPI,
+              order: e.target.value,
+            })
+          }
+        >
+          <option value="DESC">Desendente</option>
+          <option value="ASC">Ascendente</option>
+        </select>
+      </div>
+
+      <Table showCheckbox={false}>
+        {loading ? (
+          <SkeletonTable />
+        ) : (
+          <>
+            <Table.Head>
+              <Table.HeadCell>
+                <p className="text-body-5 font-medium text-metal-400">
+                  Medidas
+                </p>
+              </Table.HeadCell>
+              <Table.HeadCell>En Stock</Table.HeadCell>
+              <Table.HeadCell>Categoría</Table.HeadCell>
+              <Table.HeadCell>Fecha Registro</Table.HeadCell>
+              <Table.HeadCell>Lote</Table.HeadCell>
+              <Table.HeadCell>Caducidad</Table.HeadCell>
+              <Table.HeadCell />
+            </Table.Head>
+            <Table.Body className="divide-gray-25 divide-y">
+              {renderComponentes()}
+            </Table.Body>
+          </>
+        )}
       </Table>
 
       <ModalUpdate

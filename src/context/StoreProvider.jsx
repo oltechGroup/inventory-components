@@ -37,6 +37,8 @@ export default function StoreProvider({ children }) {
 
   const updateComponent = async (componentToUpdate, callback) => {
     try {
+      Swal.fire("Actualizando", "Espere un momento...", "info");
+      
       await instance.put(
         `/componentes/${componentToUpdate.id}`,
         {
@@ -76,6 +78,7 @@ export default function StoreProvider({ children }) {
       confirmButtonText: "Si, Borrar!",
     }).then((result) => {
       if (result.isConfirmed) {
+        Swal.fire("Eliminando!", "Espere un momento...", "info");
         instance
           .delete(`/componentes/${componente.id}`)
           .then((response) => {
