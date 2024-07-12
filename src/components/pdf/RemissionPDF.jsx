@@ -13,7 +13,7 @@ import footer from "../../assets/images/footer.png";
 // Create styles
 const styles = StyleSheet.create({
   page: {
-    paddingVertical: 20,
+    padding: 20,
     // borderStyle: "solid",
     // borderWidth: 3,
     // borderLeftColor: "#9263CD",
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   tableCell: {
     margin: "auto",
     marginTop: 5,
-    fontSize: 7,
+    fontSize: 8,
   },
   // Firma
   sectionFirma: {
