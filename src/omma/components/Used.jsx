@@ -1,21 +1,15 @@
 import {
-  Avatar,
   Badge,
   Button,
-  Popover,
   Table,
   Modal,
-  Typography,
-  DatePicker,
   Input,
   Dropdown,
-  Icon,
   Label,
   NumberInput,
   Spinner,
 } from "keep-react";
 import {
-  ArrowDown,
   Cube,
   DotsThreeOutline,
   Pencil,
@@ -27,11 +21,11 @@ import {
 } from "phosphor-react";
 
 import { useEffect, useRef, useState } from "react";
-import { instance } from "../api/instance";
+import { instance } from "../../api/instance";
 
 import Swal from "sweetalert2";
-import PaginationComponent from "../components/Pagination";
-import { SkeletonTable } from "../components/SkeletonTable";
+import PaginationComponent from "../../components/Pagination";
+import { SkeletonTable } from "../../components/SkeletonTable";
 
 const BadgeComponent = ({ children }) => {
   return (
@@ -408,15 +402,13 @@ function Used() {
             <CloudArrowUp size={28} color="#1B4DFF" />
           </Modal.Icon>
           <Modal.Content>
-            <Typography variant="div" className="!mb-6">
-              <Typography
-                variant="h3"
+            <div className="!mb-6">
+              <h3
                 className="mb-2 text-body-1 font-medium text-metal-900"
               >
                 Registrar uso de componentes
-              </Typography>
-              <Typography
-                variant="p"
+              </h3>
+              <p
                 className="text-body-4 font-normal text-metal-600"
               >
                 <div className="flex gap-4 flex-col mt-4 relative">
@@ -431,7 +423,6 @@ function Used() {
                     />
                   </div>
 
-                  <div></div>
                   <fieldset className="flex flex-col max-w-md space-y-1">
                     <Label htmlFor="category">Hospital</Label>
                     <select
@@ -549,8 +540,8 @@ function Used() {
                     onChange={handleChange}
                   />
                 </div>
-              </Typography>
-            </Typography>
+              </p>
+            </div>
           </Modal.Content>
           <Modal.Footer className="flex flex-row justify-end">
             <Button
@@ -583,15 +574,13 @@ function Used() {
             <CloudArrowUp size={28} color="#1B4DFF" />
           </Modal.Icon>
           <Modal.Content>
-            <Typography variant="div" className="!mb-6">
-              <Typography
-                variant="h3"
+            <div className="!mb-6">
+              <h3
                 className="mb-2 text-body-1 font-medium text-metal-900"
               >
                 Actualizar consumo
-              </Typography>
-              <Typography
-                variant="p"
+              </h3>
+              <p
                 className="text-body-4 font-normal text-metal-600"
               >
                 <div className="flex gap-4 flex-col mt-4">
@@ -680,8 +669,8 @@ function Used() {
                     />
                   </fieldset>
                 </div>
-              </Typography>
-            </Typography>
+              </p>
+            </div>
           </Modal.Content>
           <Modal.Footer className="flex flex-row justify-end">
             <Button
@@ -726,9 +715,7 @@ function Used() {
                   name="search"
                   onChange={handleSearchTable}
                 />
-                <Icon>
-                  <MagnifyingGlass size={18} color="#AFBACA" />
-                </Icon>
+                <MagnifyingGlass size={18} color="#AFBACA" />
               </fieldset>
             </div>
           </div>

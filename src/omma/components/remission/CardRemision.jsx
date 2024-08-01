@@ -1,7 +1,7 @@
 import { Avatar, Button, Badge } from "keep-react";
 import { Calendar, Cube } from "phosphor-react";
 import { useNavigate } from "react-router-dom";
-import { routes } from "../utils/routes";
+import { routes } from "../../../utils/routes";
 
 function CardRemision({ id, name, codigo, date, count, user, status }) {
   const nav = useNavigate();

@@ -11,7 +11,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "./context/AuthProvider";
 import { CloudArrowUp, Pencil } from "phosphor-react";
 import AvatarEditor from "react-avatar-editor";
-import { instance } from "./api/instance";
+import { instance } from "../api/instance";
 import Swal from "sweetalert2";
 
 function UserProfile() {

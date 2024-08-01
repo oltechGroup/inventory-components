@@ -4,8 +4,8 @@ import {
   instance,
   removeTokenHeaderAPI,
   setTokenHeaderAPI,
-} from "../api/instance";
-import { routes } from "../utils/routes";
+} from "../../api/instance";
+import { routes } from "../../utils/routes";
 
 export const AuthContext = createContext();
 

@@ -1,5 +1,5 @@
 import { React, createContext, useContext } from "react";
-import { instance } from "../api/instance";
+import { instance } from "../../api/instance";
 
 import Swal from "sweetalert2";
 

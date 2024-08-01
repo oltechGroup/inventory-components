@@ -1,7 +1,6 @@
 import {
   Button,
   Modal,
-  Typography,
   Input,
   Label,
   NumberInput,
@@ -64,15 +63,13 @@ function ModalUpdate({ isOpen, componentToUpdate, closeModal }) {
           <CloudArrowUp size={28} color="#1B4DFF" />
         </Modal.Icon>
         <Modal.Content>
-          <Typography variant="div" className="!mb-6">
-            <Typography
-              variant="h3"
+          <div className="!mb-6">
+            <h3
               className="mb-2 text-body-1 font-medium text-metal-900"
             >
               Editar Componente
-            </Typography>
-            <Typography
-              variant="p"
+            </h3>
+            <p
               className="text-body-4 font-normal text-metal-600"
             >
               <fieldset className="flex flex-col max-w-md space-y-1">
@@ -158,8 +155,8 @@ function ModalUpdate({ isOpen, componentToUpdate, closeModal }) {
                   </NumberInput>
                 </fieldset>
               </div>
-            </Typography>
-          </Typography>
+            </p>
+          </div>
         </Modal.Content>
         <Modal.Footer className="flex flex-row justify-end">
           <Button

@@ -1,8 +1,8 @@
 import LogoOltech from "../../components/Logo";
 import { Envelope, Lock } from "phosphor-react";
-import { Button, Icon, Input, Label, Typography, Spinner } from "keep-react";
+import { Button, Input, Label, Spinner, InputIcon } from "keep-react";
 import "./Login.css";
-import { useAuth } from "../../context/AuthProvider";
+import { useAuth } from "../context/AuthProvider";
 import { useState } from "react";
 
 function Login() {
@@ -32,20 +32,16 @@ function Login() {
       <div className="container-login">
         <form className="section-form" onSubmit={handleSubmit}>
           <LogoOltech width={150} />
-          <Typography variant="div">
-            <Typography
-              variant="h1"
-              className="mb-2 text-body-1 font-medium text-metal-900"
-            >
+
+          <div>
+            <h1 className="mb-2 text-body-1 font-medium text-metal-900">
               Bienvenido de vuelta
-            </Typography>
-            <Typography
-              variant="p"
-              className="text-body-4 font-normal text-metal-600"
-            >
+            </h1>
+            <p className="text-body-4 font-normal text-metal-600">
               Ingresa tus datos para acceder a sistema de inventario
-            </Typography>
-          </Typography>
+            </p>
+          </div>
+
           <fieldset className="space-y-1">
             <Label htmlFor="name">Correo Electrónico</Label>
             <div className="relative">
@@ -56,11 +52,12 @@ function Login() {
                 name="email"
                 onChange={handleChange}
               />
-              <Icon>
+              <InputIcon>
                 <Envelope size={19} color="#AFBACA" />
-              </Icon>
+              </InputIcon>
             </div>
           </fieldset>
+
           <fieldset className="space-y-1">
             <Label htmlFor="password">Contraseña</Label>
             <div className="relative">
@@ -72,9 +69,7 @@ function Login() {
                 type="password"
                 className="ps-11"
               />
-              <Icon>
-                <Lock size={19} color="#AFBACA" />
-              </Icon>
+              <Lock size={19} color="#AFBACA" />
             </div>
           </fieldset>
           {loading ? (

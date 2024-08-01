@@ -6,7 +6,6 @@ import {
   NumberInput,
   Spinner,
   Table,
-  Typography,
 } from "keep-react";
 import {
   ArrowLeft,
@@ -18,10 +17,10 @@ import {
 } from "phosphor-react";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { instance } from "../api/instance";
+import { instance } from "../../../api/instance";
 
 import Swal from "sweetalert2";
-import { routes } from "../utils/routes";
+import { routes } from "../../../utils/routes";
 
 export const checkStock = (value, stock) => {
   if (value > stock) {
@@ -204,9 +203,8 @@ function AddRemision() {
         <h1>Registrar remisión</h1>
       </div>
 
-      <Typography variant="div" className="flex flex-col max-w-lg mx-auto">
-        <Typography
-          variant="p"
+      <div className="flex flex-col max-w-lg mx-auto">
+        <p
           className="text-body-4 font-normal text-metal-600"
         >
           <div className="flex gap-4 flex-col mt-4">
@@ -440,7 +438,7 @@ function AddRemision() {
               </>
             )}
           </div>
-        </Typography>
+        </p>
         {dataNewRegister.componentes.length > 0 && (
           <div className="flex gap-2 self-end mt-4">
             <Button
@@ -465,7 +463,7 @@ function AddRemision() {
             )}
           </div>
         )}
-      </Typography>
+      </div>
 
       <Modal isOpen={isOpen} onClose={closeModal}>
         <Modal.Body className="space-y-3">
@@ -473,13 +471,12 @@ function AddRemision() {
             <CloudArrowUp size={28} color="#1B4DFF" />
           </Modal.Icon>
           <Modal.Content>
-            <Typography variant="div" className="!mb-6">
-              <Typography
-                variant="h3"
+            <div className="!mb-6">
+              <h3
                 className="mb-2 text-body-1 font-medium text-metal-900"
               >
                 Actualizar Cantidad
-              </Typography>
+              </h3>
               <fieldset className="space-y-1">
                 <h3>
                   {componenteToUpdate.measures} -{" "}
@@ -530,7 +527,7 @@ function AddRemision() {
                   La cantidad no puede ser mayor a {componenteToUpdate.stock}
                 </p>
               </fieldset>
-            </Typography>
+            </div>
           </Modal.Content>
           <Modal.Footer className="">
             <Button

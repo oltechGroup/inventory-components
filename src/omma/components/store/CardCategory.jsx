@@ -1,8 +1,8 @@
 import { Cube } from "phosphor-react";
-import { capitalizeString } from "../../utils/capitalizeString";
+import { capitalizeString } from "../../../utils/capitalizeString";
 import { Button } from "keep-react";
 import { useNavigate } from "react-router-dom";
-import { formatStringForURL } from "../../utils/formatStringForURL";
+import { formatStringForURL } from "../../../utils/formatStringForURL";
 
 function CardCategory({ key, title, count, lotes, remision }) {
   const nav = useNavigate();

@@ -1,4 +1,4 @@
-import { Badge, Button, Input, Icon } from "keep-react";
+import { Badge, Button, Input } from "keep-react";
 import { Cards, Cube, ListBullets, MagnifyingGlass } from "phosphor-react";
 
 import { useState } from "react";
@@ -78,9 +78,7 @@ function Store() {
                 }
               }}
             />
-            <Icon>
               <MagnifyingGlass size={18} color="#AFBACA" />
-            </Icon>
           </fieldset>
         </div>
       </div>

@@ -1,23 +1,10 @@
+import { format } from "@formkit/tempo";
+
 import {
-  Avatar,
-  Badge,
-  Button,
-  Popover,
-  Table,
-  Modal,
-  Typography,
-  Input,
-  Dropdown,
-  Icon,
-} from "keep-react";
-import {
-  ArrowDown,
-  Cube,
-  DotsThreeOutline,
-  Pencil,
-  Trash,
   CloudArrowUp,
-  MagnifyingGlass,
+  Funnel,
+  Plus,
+  DotsThreeOutlineVertical,
 } from "phosphor-react";
 
 import { useEffect, useState } from "react";
@@ -25,10 +12,40 @@ import { instance } from "../api/instance";
 
 import Swal from "sweetalert2";
 
+import {
+  Badge,
+  Button,
+  Dropdown,
+  DropdownAction,
+  DropdownContent,
+  DropdownItem,
+  DropdownList,
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Input,
+  Modal,
+  ModalAction,
+  ModalBody,
+  ModalClose,
+  ModalContent,
+  ModalDescription,
+  ModalFooter,
+  ModalHeader,
+  ModalTitle,
+} from "keep-react";
+import { SkeletonTable } from "../components/SkeletonTable";
+
 function Hospitals() {
   const [dataNewHospital, setDataNewHospital] = useState({
     name: "",
   });
+
+  const [loading, setLoading] = useState(true);
 
   const [hospitals, setHospitals] = useState([]);
   const [hospitalsInfo, setHospitalsInfo] = useState({});
@@ -55,6 +72,14 @@ function Hospitals() {
   const sendFormUpdate = async () => {
     try {
       closeModalUpdate();
+      Swal.fire({
+        title: "Actualizando hospital...",
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading();
+        },
+      });
+      
       await instance.put(`/hospitals/${hospitalToUpdate.id}`, hospitalToUpdate);
       getHospitals();
       Swal.fire({
@@ -81,10 +106,22 @@ function Hospitals() {
   };
 
   const getHospitals = () => {
-    instance.get("/hospitals").then((response) => {
-      setHospitals(response.data.data);
-      setHospitalsInfo(response.data.info);
-    });
+    instance
+      .get("/hospitals")
+      .then((response) => {
+        console.log(response.data);
+        setHospitals(response.data.data);
+        setHospitalsInfo(response.data.info);
+      })
+      .catch((error) => {
+        console.error(error);
+        Swal.fire({
+          title: "Error",
+          text: "Ha ocurrido un error al obtener los hospitales",
+          icon: "error",
+        });
+      })
+      .finally(() => setLoading(false));
   };
 
   const deleteHospital = (hospital) => {
@@ -99,6 +136,14 @@ function Hospitals() {
       confirmButtonText: "Si, Borrar!",
     }).then((result) => {
       if (result.isConfirmed) {
+        Swal.fire({
+          title: "Eliminando hospital...",
+          showConfirmButton: false,
+          willOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
         instance
           .delete(`/hospitals/${hospital.id}`)
           .then((response) => {
@@ -130,7 +175,13 @@ function Hospitals() {
 
   const sendForm = async () => {
     try {
-      closeModal();
+      Swal.fire({
+        title: "Creando hospital...",
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading();
+        },
+      });
 
       await instance.post("/hospitals", dataNewHospital);
       getHospitals();
@@ -149,58 +200,36 @@ function Hospitals() {
     }
   };
 
-  useEffect(() => getHospitals(), []);
-
   const renderHospitals = () => {
     return hospitals.map((hospital, index) => (
-      <Table.Row className="bg-white" key={hospital.id}>
-        <Table.Cell>
-          <p>{index + 1}</p>
-        </Table.Cell>
-        <Table.Cell>
+      <TableRow key={hospital.id}>
+        <TableCell>{index + 1}</TableCell>
+        <TableCell>
           <Badge color="primary">{hospital.name}</Badge>
-        </Table.Cell>
-        <Table.Cell>
-          <p>{new Date(hospital.registration_date).toDateString()}</p>
-        </Table.Cell>
-        <Table.Cell>
-          <Dropdown
-            action={
-              <Button variant="outline" size="sm" shape="circle">
-                <DotsThreeOutline size={15} />
-              </Button>
-            }
-            actionClassName="border-none"
-          >
-            <Dropdown.List>
-              <ul>
-                <li className="rounded px-2 py-1 hover:bg-metal-100">
-                  <button
-                    className="flex w-full items-center justify-between text-body-4 font-normal text-metal-600"
-                    onClick={() => deleteHospital(hospital)}
-                  >
-                    <span>Borrar</span>
-                    <span>
-                      <Trash />
-                    </span>
-                  </button>
-                </li>
-                <li className="rounded px-2 py-1 hover:bg-metal-100">
-                  <button
-                    className="flex w-full items-center justify-between text-body-4 font-normal text-metal-600"
-                    onClick={() => showModalUpdate(hospital)}
-                  >
-                    <span>Editar</span>
-                    <span>
-                      <Pencil />
-                    </span>
-                  </button>
-                </li>
-              </ul>
-            </Dropdown.List>
+        </TableCell>
+        <TableCell>
+          {format(hospital.registration_date, "MMMM D, YYYY", "es")}
+        </TableCell>
+        <TableCell>
+          <Dropdown>
+            <DropdownAction asChild>
+              <button>
+                <DotsThreeOutlineVertical className="size-4 fill-metal-900 dark:fill-white" />
+              </button>
+            </DropdownAction>
+            <DropdownContent className="max-w-[200px] p-3">
+              <DropdownList>
+                <DropdownItem onClick={() => showModalUpdate(hospital)}>
+                  Editar
+                </DropdownItem>
+                <DropdownItem onClick={() => deleteHospital(hospital)}>
+                  Borrar
+                </DropdownItem>
+              </DropdownList>
+            </DropdownContent>
           </Dropdown>
-        </Table.Cell>
-      </Table.Row>
+        </TableCell>
+      </TableRow>
     ));
   };
 
@@ -208,68 +237,17 @@ function Hospitals() {
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={closeModal}>
-        <Modal.Body className="space-y-3">
-          <Modal.Icon>
-            <CloudArrowUp size={28} color="#1B4DFF" />
-          </Modal.Icon>
-          <Modal.Content>
-            <Typography variant="div" className="!mb-6">
-              <Typography
-                variant="h3"
-                className="mb-2 text-body-1 font-medium text-metal-900"
-              >
-                Agregar nuevo hospital
-              </Typography>
-              <Typography
-                variant="p"
-                className="text-body-4 font-normal text-metal-600"
-              >
-                <div className="flex gap-4 flex-col mt-4">
-                  <Input
-                    placeholder="Nombre del hospital"
-                    name="name"
-                    type="text"
-                    onChange={handleChange}
-                  />
-                </div>
-              </Typography>
-            </Typography>
-          </Modal.Content>
-          <Modal.Footer className="flex flex-row justify-end">
-            <Button
-              onClick={closeModal}
-              size="sm"
-              variant="outline"
-              color="secondary"
-            >
-              Cancelar
-            </Button>
-            <Button type="submit" onClick={sendForm} size="sm" color="primary">
-              Confirmar
-            </Button>
-          </Modal.Footer>
-        </Modal.Body>
-      </Modal>
-
       <Modal isOpen={modalUpdateOpen} onClose={closeModalUpdate}>
-        <Modal.Body className="space-y-3">
-          <Modal.Icon>
-            <CloudArrowUp size={28} color="#1B4DFF" />
-          </Modal.Icon>
-          <Modal.Content>
-            <Typography variant="div" className="!mb-6">
-              <Typography
-                variant="h3"
-                className="mb-2 text-body-1 font-medium text-metal-900"
-              >
-                Editar Hospital
-              </Typography>
-              <Typography
-                variant="p"
-                className="text-body-4 font-normal text-metal-600"
-              >
-                <div className="flex gap-4 flex-col mt-4">
+        <ModalBody>
+          <ModalContent>
+            <ModalClose className="absolute right-4 top-4" />
+            <ModalHeader className="mb-6 space-y-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-metal-50 dark:bg-metal-800">
+                <CloudArrowUp size={28} color="#1B4DFF" />
+              </div>
+              <div className="space-y-1">
+                <ModalTitle>Actualizar Hospital</ModalTitle>
+                <ModalDescription>
                   <Input
                     placeholder="Nombre del hospital"
                     name="name"
@@ -277,72 +255,123 @@ function Hospitals() {
                     value={hospitalToUpdate.name}
                     onChange={handleChangeUpdate}
                   />
-                </div>
-              </Typography>
-            </Typography>
-          </Modal.Content>
-          <Modal.Footer className="flex flex-row justify-end">
-            <Button
-              onClick={closeModalUpdate}
-              size="sm"
-              variant="outline"
-              color="secondary"
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              onClick={sendFormUpdate}
-              size="sm"
-              color="primary"
-            >
-              Confirmar
-            </Button>
-          </Modal.Footer>
-        </Modal.Body>
-      </Modal>
-      <h1>Hospitales</h1>
-      <Table showCheckbox={true}>
-        <Table.Caption>
-          <div className="my-5 flex items-center px-6">
-            <div className="flex items-center gap-5">
-              <p className="text-body-1 font-semibold text-metal-600">
-                Hospitales Registrados
-              </p>
-              <Badge size="sm" color="secondary">
-                {hospitalsInfo.totalCount} Hospitales
-              </Badge>
-            </div>
-            <div className="flex ml-5 items-center gap-5">
-              <Button variant="outline" size="sm" onClick={openModal}>
-                <span className="pr-2">
-                  <Cube size={24} />
-                </span>
-                Nuevo Hospital
+                </ModalDescription>
+              </div>
+            </ModalHeader>
+            <ModalFooter>
+              <Button
+                size="sm"
+                variant="outline"
+                color="secondary"
+                onClick={closeModalUpdate}
+              >
+                Cancelar
               </Button>
-              <fieldset className="relative w-64">
-                <Input
-                  placeholder="Buscar por categoría o medidas"
-                  className="ps-11"
-                />
-                <Icon>
-                  <MagnifyingGlass size={18} color="#AFBACA" />
-                </Icon>
-              </fieldset>
-            </div>
-          </div>
-        </Table.Caption>
+              <Button size="sm" color="primary" onClick={sendFormUpdate}>
+                Actualizar
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </ModalBody>
+      </Modal>
 
-        <Table.Head>
-          <Table.HeadCell>No.</Table.HeadCell>
-          <Table.HeadCell>Nombre</Table.HeadCell>
-          <Table.HeadCell>Fecha Registro</Table.HeadCell>
-          <Table.HeadCell />
-        </Table.Head>
-        <Table.Body className="divide-gray-25 divide-y">
-          {renderHospitals()}
-        </Table.Body>
-      </Table>
+      {loading ? (
+        <SkeletonTable />
+      ) : (
+        <Table>
+          <TableCaption>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-5">
+                <h2 className="text-heading-6 font-semibold text-metal-900 dark:text-white">
+                  Hospitales
+                </h2>
+                <Badge
+                  color="secondary"
+                  className="dark:bg-metal-800 dark:text-white"
+                >
+                  {hospitalsInfo.totalCount} Hospitales
+                </Badge>
+              </div>
+              <div className="flex items-center gap-5">
+                <Modal isOpen={isOpen} onClose={closeModal}>
+                  <ModalAction asChild>
+                    <Button
+                      variant="outline"
+                      color="secondary"
+                      size="xs"
+                      className="flex gap-1.5"
+                    >
+                      <Plus className="size-4 fill-metal-900 dark:fill-white" />
+                      Agregar Hospital
+                    </Button>
+                  </ModalAction>
+                  <ModalBody>
+                    <ModalContent>
+                      <ModalClose className="absolute right-4 top-4" />
+                      <ModalHeader className="mb-6 space-y-3">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-metal-50 dark:bg-metal-800">
+                          <CloudArrowUp size={28} color="#1B4DFF" />
+                        </div>
+                        <div className="space-y-1">
+                          <ModalTitle>Agregar Hospital</ModalTitle>
+                          <ModalDescription>
+                            <Input
+                              placeholder="Nombre del hospital"
+                              name="name"
+                              type="text"
+                              onChange={handleChange}
+                            />
+                          </ModalDescription>
+                        </div>
+                      </ModalHeader>
+                      <ModalFooter>
+                        <ModalClose asChild>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            color="secondary"
+                            onClick={closeModal}
+                          >
+                            Cancelar
+                          </Button>
+                        </ModalClose>
+                        <Button size="sm" color="primary" onClick={sendForm}>
+                          Agregar
+                        </Button>
+                      </ModalFooter>
+                    </ModalContent>
+                  </ModalBody>
+                </Modal>
+
+                <Button
+                  variant="outline"
+                  color="secondary"
+                  size="xs"
+                  className="flex gap-1.5"
+                >
+                  <Funnel className="size-4 fill-metal-900 dark:fill-white" />
+                  Filtrar
+                </Button>
+              </div>
+            </div>
+          </TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead>
+                <div className="w-[65px]">No.</div>
+              </TableHead>
+              <TableHead>
+                <div>Nombre</div>
+              </TableHead>
+              <TableHead>
+                <div>Fecha de registro</div>
+              </TableHead>
+              <TableHead></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>{renderHospitals()}</TableBody>
+        </Table>
+      )}
     </>
   );
 }

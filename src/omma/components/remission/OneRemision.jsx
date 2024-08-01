@@ -2,11 +2,9 @@ import {
   Avatar,
   Badge,
   Button,
-  Icon,
   Input,
   Table,
   Modal,
-  Typography,
   NumberInput,
 } from "keep-react";
 import {
@@ -24,11 +22,11 @@ import {
 } from "phosphor-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { instance } from "../api/instance";
-import { SkeletonCharts } from "../components/SkeletonCharts";
+import { instance } from "../../../api/instance";
+import { SkeletonCharts } from "../../../components/SkeletonCharts";
 
 import Swal from "sweetalert2";
-import { routes } from "../utils/routes";
+import { routes } from "../../../utils/routes";
 import RemissionPDF from "../components/pdf/RemissionPDF";
 
 import { pdf } from "@react-pdf/renderer";
@@ -571,9 +569,7 @@ function OneRemision() {
                   className="ps-11"
                   name="search"
                 />
-                <Icon>
                   <MagnifyingGlass size={18} color="#AFBACA" />
-                </Icon>
               </fieldset>
             </div>
             <Button variant="outline" size="sm" onClick={openModalAddComponent}>
@@ -603,16 +599,15 @@ function OneRemision() {
             <CloudArrowUp size={28} color="#1B4DFF" />
           </Modal.Icon>
           <Modal.Content>
-            <Typography variant="div" className="!mb-6">
-              <Typography
-                variant="h3"
+            <div className="!mb-6">
+              <h3
                 className="mb-2 text-body-1 font-medium text-metal-900"
               >
                 Comprobación de entrega
-              </Typography>
-              <Typography variant="p" className="text-body-3 text-metal-400">
+              </h3>
+              <p className="text-body-3 text-metal-400">
                 Revisa cuidadosamente la cantidad de componentes entregados
-              </Typography>
+              </p>
               <Table>
                 <Table.Head>
                   <Table.HeadCell>
@@ -689,7 +684,7 @@ function OneRemision() {
                   )}
                 </Table.Body>
               </Table>
-            </Typography>
+            </div>
           </Modal.Content>
           <Modal.Footer className="self-end">
             <Button

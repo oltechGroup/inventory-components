@@ -1,18 +1,15 @@
-import { Avatar, Badge, Button, Icon, Input, Popover, Table } from "keep-react";
+import { Badge, Input, Table } from "keep-react";
 import {
   ArrowDown,
   ArrowUp,
   ArrowsDownUp,
-  Cube,
-  DotsThreeOutline,
   MagnifyingGlass,
-  Pencil,
   Trash,
 } from "phosphor-react";
 import { useEffect, useState } from "react";
-import { instance } from "../api/instance";
-import PaginationComponent from "../components/Pagination";
-import { SkeletonTable } from "../components/SkeletonTable";
+import { instance } from "../../api/instance";
+import PaginationComponent from "../../components/Pagination";
+import { SkeletonTable } from "../../components/SkeletonTable";
 
 function Inventary() {
   const [loading, setLoading] = useState(true);
@@ -182,9 +179,7 @@ function Inventary() {
                   onChange={handleSearch}
                 />
                 
-                <Icon>
                   <MagnifyingGlass size={18} color="#AFBACA" />
-                </Icon>
               </fieldset>
             </div>
           </div>

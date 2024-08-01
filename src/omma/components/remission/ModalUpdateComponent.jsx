@@ -1,15 +1,13 @@
-import { Button, Label, Modal, NumberInput, Typography } from "keep-react";
+import { Button, Label, Modal, NumberInput } from "keep-react";
 import { CloudArrowUp, Minus, Plus } from "phosphor-react";
 import { useEffect, useState } from "react";
-import { checkStock } from "../../pages/AddRemision";
-import { instance } from "../../api/instance";
+import { checkStock } from "../../../pages/AddRemision";
+import { instance } from "../../../api/instance";
 import Swal from "sweetalert2";
 
 function ModalUpdateComponent({ isOpen, closeModal, component }) {
   const [componenteToUpdate, setComponenteToUpdate] = useState({});
 
-  console.log(component);
-  
   const updateComponent = (id, quantity) => {
     instance.put(`/componentes/update/component-remission/${id}`, {
       quantity: quantity,
@@ -34,13 +32,11 @@ function ModalUpdateComponent({ isOpen, closeModal, component }) {
           <CloudArrowUp size={28} color="#1B4DFF" />
         </Modal.Icon>
         <Modal.Content>
-          <Typography variant="div" className="!mb-6">
-            <Typography
-              variant="h3"
-              className="mb-2 text-body-1 font-medium text-metal-900"
+          <div className="!mb-6">
+            <h3 className="mb-2 text-body-1 font-medium text-metal-900"
             >
               Actualizar Cantidad
-            </Typography>
+            </h3>
             <fieldset className="space-y-1">
               <h3>
                 {componenteToUpdate.measures} -{" "}
@@ -91,7 +87,7 @@ function ModalUpdateComponent({ isOpen, closeModal, component }) {
                 La cantidad no puede ser mayor a {component.stock + component.quantity}
               </p>
             </fieldset>
-          </Typography>
+          </div>
         </Modal.Content>
         <Modal.Footer>
           <Button

@@ -1,11 +1,11 @@
-import { Badge, Button, Icon, Input } from "keep-react";
+import { Badge, Button, Input } from "keep-react";
 import { Cube, MagnifyingGlass } from "phosphor-react";
 import CardRemision from "../components/CardRemision";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { routes } from "../utils/routes";
-import { SkeletonRemissions } from "../components/SkeletonRemissions";
-import { instance } from "../api/instance";
+import { routes } from "../../../utils/routes";
+import { SkeletonRemissions } from "../../../components/SkeletonRemissions";
+import { instance } from "../../../api/instance";
 
 function Remisiones() {
   const nav = useNavigate();
@@ -68,9 +68,7 @@ function Remisiones() {
               className="ps-11"
               name="search"
             />
-            <Icon>
               <MagnifyingGlass size={18} color="#AFBACA" />
-            </Icon>
           </fieldset>
         </div>
       </div>

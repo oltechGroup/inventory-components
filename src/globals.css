@@ -1,3 +1,4 @@
+@import '@sweetalert2/theme-dark/dark.css';
 @import "keep-react/css";
 @tailwind base;
 @tailwind components;
@@ -9,11 +10,24 @@
   font-weight: 400;
 
   --color-blue: #0070ef;
+  color-scheme: light dark;
+  
+  color: rgba(255, 255, 255, 0.87);
+
+  background-color: #0D1015;
   
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@media (prefers-color-scheme: light) {
+
+  :root {
+    color: #213547;
+    background-color: #eff7ff;
+  }
 }
 
 * {

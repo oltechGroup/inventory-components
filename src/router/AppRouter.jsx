@@ -1,8 +1,8 @@
 import { Route, Routes, Navigate } from "react-router-dom";
 import { routes } from "../utils/routes";
-import Login from "../pages/auth/Login";
-import { useAuth } from "../context/AuthProvider";
+import { useAuth } from "../auth/context/AuthProvider";
 import Home from "../pages/Home";
+import Login from "../auth/forms/Login";
 
 function AppRouter() {
   const { user } = useAuth();
