@@ -10,13 +10,6 @@ function AppRouter() {
   const renderRoutes = () => {
     if (user) {
       return <Route path={`${routes.home}*`} element={<Home />} />;
-    } else {
-      return (
-        <>
-          <Route path={routes.home} element={<Login />} />;
-          <Route path="*" element={<Navigate to={routes.home} />} />;
-        </>
-      );
     }
   };
 
