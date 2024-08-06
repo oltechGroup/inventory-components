@@ -1,6 +1,6 @@
 import "./Pagination.css";
 
-function Pagination({ pages = 1, currentPage, onChange }) {
+function PaginationComponent({ pages = 1, currentPage, onChange }) {
 
   if (pages <= 1) {
     return null;
@@ -133,4 +133,4 @@ function Pagination({ pages = 1, currentPage, onChange }) {
   );
 }
 
-export default Pagination;
+export default PaginationComponent;

@@ -1,6 +1,7 @@
 import { CloudArrowUp } from "phosphor-react";
 import {
   Button,
+  Input,
   Modal,
   ModalBody,
   ModalClose,
@@ -21,6 +22,9 @@ function ModalAdd({ isActive, onCloseModal }) {
               <CloudArrowUp size={28} color="#1B4DFF" />
             </div>
             <ModalTitle>Registrar Consumo</ModalTitle>
+            <div>
+            <Input placeholder="Enter name" type="text" />
+            </div>
           </ModalHeader>
           <ModalFooter>
             <ModalClose asChild>
